@@ -288,6 +288,12 @@ void setup() {
   server.on("/setting_jadwal.html", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/setting_jadwal.html", String(), false, processor);
   });
+  server.on("/setting_wifi.html", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/setting_wifi.html", String(), false, processor);
+  });
+  server.on("/setting_backup.html", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/setting_backup.html", String(), false, processor);
+  });
   server.on("/setting_nada.html", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/setting_nada.html", String(), false, processor);
   });

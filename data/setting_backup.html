@@ -166,17 +166,7 @@
               <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                  <h6 class="m-0 font-weight-bold text-primary">Wifi</h6>                
-                  <div style="display:none">
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" name="radioHari" id="radioHari1" value="Senin">
-                      <label class="form-check-label" for="radioHari1">Access Point Mode</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="radio" name="radioHari" id="radioHari2" value="Selasa">
-                      <label class="form-check-label" for="radioHari2">Client Mode</label>
-                    </div>
-                  </div>
+                  <h6 class="m-0 font-weight-bold text-primary">Backup</h6>                
                   
                 </div>
                 <!-- Card Body -->
@@ -185,20 +175,19 @@
                   <table width='100%'>
                     <tr>
                       <td>
-                          <h4>SSID</h4>  
-                          <input type='text' class='form-control' style="width:230px !important" id="ssid" name='ssid'><br><br>
+                          
                       </td>
                       <td>
-                          <h4>Password</h4>
-                          <input type='password' class='form-control'style="width:230px !important" id="password" name='password'><br><br>
+                          <h4>Restore</h4>
+                          <input type="file" id="fileRestore" name="fileRestore" />
                       </td>
                     </tr>
                     <tr>
                       <td>
-                        
+                        <a id="btnSubmit" class='btn btn-primary'><b style="color:white">Backup</b></a>  
                       </td>
                       <td>
-                        <a id="btnSubmit" class='btn btn-primary'><b style="color:white">Simpan</b></a>  
+                        <a id="btnSubmit" class='btn btn-primary'><b style="color:white">Restore</b></a>  
                       </td>
                     </tr>
                   </table>
