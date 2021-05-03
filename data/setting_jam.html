@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>WIFI SMART AUDIO SWITCH</title>
+
+  <!-- Custom fonts for this template -->
+  <link rel="icon" href="favicon.ico" type="image/gif" sizes="16x16">
+  <link href="font.css" rel="stylesheet">
+
+  <!-- Custom styles for this template-->
+  <link href="sb-admin-2.min.css" rel="stylesheet">
+
+</head>
+
+<body id="page-top" onload="javascript:start();">
+
+  <!-- Page Wrapper -->
+  <div id="wrapper">
+
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+      <!-- Sidebar - Brand -->
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
+        <div class="sidebar-brand-icon">
+          <img src="favicon.ico" width="32px"/>
+        </div>
+        <div class="sidebar-brand-text mx-1">WIFI SMART AUDIO SWITCH</div>
+      </a>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider my-0">
+
+      <!-- Nav Item - Dashboard -->
+      <li class="nav-item ">
+        <a class="nav-link" href="/">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Dashboard</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="setting_ruangan.html">
+              <i class="fas fa-fw fa-tachometer-alt"></i>
+              <span>Ruangan</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="setting_jadwal.html">
+              <i class="fas fa-fw fa-tachometer-alt"></i>
+              <span>Jadwal</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="setting_nada.html">
+              <i class="fas fa-fw fa-tachometer-alt"></i>
+              <span>Nada</span>
+          </a>
+        </li>
+        <!-- Divider -->
+        <hr class="sidebar-divider">
+        <li class="nav-item active">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#pengaturan" aria-expanded="true" aria-controls="collapseTwo">
+            <span>Pengaturan</span>
+        </a>
+        <div id="pengaturan" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item" href="setting_jam.html">Waktu dan tanggal</a>
+            <a class="collapse-item" href="setting_wifi.html">Wifi</a>
+            </div>
+        </div>
+      </li>
+      <!-- Divider -->
+      <hr class="sidebar-divider d-none d-md-block">
+
+
+      <!-- Sidebar Toggler (Sidebar) -->
+      <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+      </div>
+
+    </ul>
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+      <!-- Main Content -->
+      <div id="content">
+
+        <!-- Topbar -->
+        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+          <!-- Sidebar Toggle (Topbar) -->
+          <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+            <i class="fa fa-bars"></i>
+          </button>
+
+          <!-- Topbar Search -->
+          <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+            <b id="connectionState" >Terhubung</b>
+            <div class="input-group">
+              <h5 id="lblIP">IP Address <br>
+              192.168.4.1</h5> 
+            </div>
+          </form>
+
+          <!-- Topbar Navbar -->
+          <ul class="navbar-nav ml-auto">
+
+            <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+            <li class="nav-item dropdown no-arrow d-sm-none">
+              <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-search fa-fw"></i>
+              </a>
+              <!-- Dropdown - Messages -->
+              <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
+                <form class="form-inline mr-auto w-100 navbar-search">
+                  <div class="input-group">
+                    <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                      <button class="btn btn-primary" type="button">
+                        <i class="fas fa-search fa-sm"></i>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </li>
+            <h5>
+            <div class='info'>
+              <span id='day'></span>/<span id='month'></span>/<span id='year'></span><span> </span>
+              <span id='hour'></span>:<span id='minute'></span>:<span id='second'></span><span> </span>
+              <span id='temp'></span><span>C</span><br>
+
+            </div>
+            </h5>
+          </ul>
+
+        </nav>
+        <!-- End of Topbar -->
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+
+          <!-- Page Heading -->
+          <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Pengaturan</h1>
+          </div>
+
+          <!-- Content Row -->
+          
+          <!-- Content Row -->
+
+          <div class="row">
+
+            <!-- Area Chart -->
+            <div class="col-lg-11">
+              <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 class="m-0 font-weight-bold text-primary">Jadwal</h6>                
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                  <table width='100%'>
+                    <tr>
+                      <td>
+                        <form >
+                          <h4>Tanggal</h4>  
+                          <input type='date' class='form-control' style="width:230px !important" id="date" name='date' min='2017-03-20'><br><br>
+                          <button class='btn btn-primary' type='button' onclick="sendDate();">Ubah Tanggal</button>  
+                        </form>  
+                      </td>
+                      <td>
+                        <form >  
+                          <h4>Jam</h4>
+                          <input type='time' class='form-control'style="width:230px !important" id="time" name='time'><br><br>
+                          <button class='btn btn-primary' type='button' onclick="sendTime();">Ubah Jam</button>  
+                        </form>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Content Row -->
+        </div>
+        <!-- /.container-fluid -->
+      </div>
+      <!-- End of Main Content -->
+
+      <!-- Footer -->
+      <footer class="sticky-footer bg-white">
+        <div class="container my-auto">
+          <div class="copyright text-center my-auto">
+            <span>Copyright &copy; CV. Mitra Sentosa Teknologi 2020</span>
+          </div>
+        </div>
+      </footer>
+      <!-- End of Footer -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+  </div>
+  <!-- End of Page Wrapper -->
+
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+  <!-- Logout Modal-->
+  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <a class="btn btn-primary" href="login.html">Logout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Bootstrap core JavaScript-->
+  
+  <script src="jquery.min.js"></script>
+  <script id="myJson" type="text/javascript" >
+  
+  </script>
+
+
+
+  <script type="text/javascript">
+    var websock;
+    function start() {
+      websock = new WebSocket('ws://' + window.location.hostname + ':81/');
+      websock.onopen = function(evt) { 
+        console.log('websock open');
+        websock.send("request_data");
+      };
+     websock.onclose = function(evt) { console.log('websock close'); };
+     websock.onerror = function(evt) { console.log(evt); };
+     websock.onmessage = function(evt) {
+       console.log(evt);
+       var e = document.getElementById('ledstatus');
+       var e = document.getElementById('ledstatus');
+       if (evt.data.includes("waktu__")){
+        var str=evt.data.replace("waktu__","");
+        var w  = str.split(';')[0].split(",");
+        var temp = str.split(';')[1];
+        var d = new Date(w[0], w[1], w[2], w[3], w[4], w[5]);
+        
+        var dd = d.getDate();
+        var mm = d.getMonth();
+        var yy = d.getFullYear();
+        var months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "December"];
+        var namabulan = months[mm];
+        var hari = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+        var namahari = hari[d.getDay()];
+        setInterval(function() {
+
+        //var currentTime = new Date();
+        var currentTime = d;
+        d.setSeconds(d.getSeconds()+1);
+        var hours = currentTime.getHours();
+        var minutes = currentTime.getMinutes();
+        var seconds = currentTime.getSeconds();
+
+        // Add leading zeros
+        hours = (hours < 10 ? "0" : "") + hours;
+        minutes = (minutes < 10 ? "0" : "") + minutes;
+        seconds = (seconds < 10 ? "0" : "") + seconds;
+
+        // Compose the string for display
+        var currentTimeString = hours + ":" + minutes + ":" + seconds+"</br>"+namahari+", "+dd+" "+namabulan+" "+yy;
+        $(".info").html(currentTimeString);
+
+        }, 1000);
+        
+       }
+     };
+     process();
+
+    }
+    
+
+    function sendDate(){
+      var strDate = $("#date").val();
+      websock.send("updateDate_"+strDate);
+    }
+    function sendTime(){
+      var strTime = $("#time").val();
+      websock.send("updateTime_"+strTime);
+    }
+    //var txt = '[{"nomor": 1, "kelas": "X", "jurusan": "IPA 1", "gedung": "A-1"},{"nomor": 2, "kelas": "X", "jurusan": "IPA 2", "gedung": "A-1"},{"nomor": 3, "kelas": "X", "jurusan": "IPA 3", "gedung": "A-1"},{"nomor": 4, "kelas": "X", "jurusan": "IPA 4", "gedung": "A-1"},{"nomor": 5, "kelas": "X", "jurusan": "IPA 5", "gedung": "B-1"},{"nomor": 6, "kelas": "X", "jurusan": "IPS 1", "gedung": "B-1"},{"nomor": 7, "kelas": "X", "jurusan": "IPS 2", "gedung": "B-1"},{"nomor": 8, "kelas": "X", "jurusan": "IPS 3", "gedung": "B-1"},{"nomor": 9, "kelas": "X", "jurusan": "IPS 4", "gedung": "C-1"},{"nomor": 10, "kelas": "X", "jurusan": "IPS 5", "gedung": "C-1"},{"nomor": 11, "kelas": "XI", "jurusan": "IPA 1", "gedung": "C-1"},{"nomor": 12, "kelas": "XI", "jurusan": "IPA 2", "gedung": "C-2"},{"nomor": 13, "kelas": "XI", "jurusan": "IPA 3", "gedung": "C-2"},{"nomor": 14, "kelas": "XI", "jurusan": "IPA 4", "gedung": "C-2"},{"nomor": 15, "kelas": "XI", "jurusan": "IPA 5", "gedung": "D-1"},{"nomor": 16, "kelas": "XI", "jurusan": "IPS 1", "gedung": "D-1"},{"nomor": 17, "kelas": "XI", "jurusan": "IPS 2", "gedung": "D-1"},{"nomor": 18, "kelas": "XI", "jurusan": "IPS 3", "gedung": "D-2"},{"nomor": 19, "kelas": "XI", "jurusan": "IPS 4", "gedung": "D-2"},{"nomor": 20, "kelas": "XI", "jurusan": "IPS 5", "gedung": "D-2"},{"nomor": 21, "kelas": "XII", "jurusan": "IPA 1", "gedung": "D-2"},{"nomor": 22, "kelas": "XII", "jurusan": "IPA 2", "gedung": "E-1"},{"nomor": 23, "kelas": "XII", "jurusan": "IPA 3", "gedung": "E-1"},{"nomor": 24, "kelas": "XII", "jurusan": "IPA 4", "gedung": "E-1"},{"nomor": 25, "kelas": "XII", "jurusan": "IPA 5", "gedung": "E-1"},{"nomor": 26, "kelas": "XII", "jurusan": "IPS 1", "gedung": "E-1"},{"nomor": 27, "kelas": "XII", "jurusan": "IPS 2", "gedung": "E-1"},{"nomor": 28, "kelas": "XII", "jurusan": "IPS 3", "gedung": "F-1"},{"nomor": 29, "kelas": "XII", "jurusan": "IPS 4", "gedung": "F-1"},{"nomor": 30, "kelas": "XII", "jurusan": "IPS 5", "gedung": "F-1"},{"nomor": 31, "kelas": "OUT", "jurusan": "Lapangan", "gedung": "F-1"},{"nomor": 32, "kelas": "OUT", "jurusan": "Selasar", "gedung": "F-1"}]';
+  
+    var val = "";
+    var xmlhttp, myObj, x;
+    xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+     if (this.readyState == 4 && this.status == 200) {
+        myObj = JSON.parse(this.responseText);
+       // myObj = JSON.parse(txt);
+        for (x in myObj) {
+          var namakelas = myObj[x].kelas + " " + myObj[x].jurusan;
+          val+="<label style='border:1px solid #727a7c;text-align:center;padding:5px;margin:5px;width:120px'><pre>"+namakelas+"</pre><label class='switch' ><input type='checkbox' id='speaker_"+myObj[x].nomor+"' class='switch-input checkbox'><span class='switch-label' data-on='on' data-off='off'></span><span class='switch-handle'></span></label></label>";
+        }
+        $("#buttonContainer").html(val);
+        
+        $("input:checkbox").click(function(){
+          var b = this.checked;
+          var strBool = "_off";
+            if (b){
+              strBool="_on";
+            }
+          if (this.id == "speaker_all"){
+            $('.checkbox').each(function(index, item){
+              if (b){
+                $(item).prop('checked',true);
+              }else{
+                $(item).prop('checked',false);
+              }
+            })
+            websock.send(this.id+strBool);
+            console.log(this.id+strBool); 
+          }else{
+            websock.send(this.id+strBool);
+            console.log(this.id+strBool); 
+          }
+          
+        })
+     }
+   };
+   xmlhttp.open("GET", "settings.json", true);
+   xmlhttp.send();
+  
+
+
+    
+  var xmlHttp=createXmlHttpObject();
+
+  function createXmlHttpObject(){
+    if(window.XMLHttpRequest){
+        xmlHttp=new XMLHttpRequest();
+    }else{
+        xmlHttp=new ActiveXObject('Microsoft.XMLHTTP');// code for IE6, IE5
+    }
+    return xmlHttp;
+  }
+
+  function process(){
+    if(xmlHttp.readyState==0 || xmlHttp.readyState==4){
+      xmlHttp.open('GET','xml',true);
+      xmlHttp.onreadystatechange=handleServerResponse;
+      xmlHttp.send(null);
+    }
+    //setTimeout('process()',1000);
+  }
+
+  function handleServerResponse(){
+    if(xmlHttp.readyState==4 && xmlHttp.status==200){
+      xmlResponse=xmlHttp.responseXML;
+
+      xmldoc = xmlResponse.getElementsByTagName('rYear');
+      message = xmldoc[0].firstChild.nodeValue;
+      document.getElementById('year').innerHTML=message;
+
+      xmldoc = xmlResponse.getElementsByTagName('rMonth');
+      message = xmldoc[0].firstChild.nodeValue;
+      document.getElementById('month').innerHTML=message;
+
+      xmldoc = xmlResponse.getElementsByTagName('rDay');
+      message = xmldoc[0].firstChild.nodeValue;
+      document.getElementById('day').innerHTML=message;
+
+      xmldoc = xmlResponse.getElementsByTagName('rHour');
+      message = xmldoc[0].firstChild.nodeValue;
+      document.getElementById('hour').innerHTML=message;
+
+      xmldoc = xmlResponse.getElementsByTagName('rMinute');
+      message = xmldoc[0].firstChild.nodeValue;
+      document.getElementById('minute').innerHTML=message;
+
+      xmldoc = xmlResponse.getElementsByTagName('rSecond');
+      message = xmldoc[0].firstChild.nodeValue;
+      document.getElementById('second').innerHTML=message;
+
+      xmldoc = xmlResponse.getElementsByTagName('rTemp');
+      message = xmldoc[0].firstChild.nodeValue;
+      document.getElementById('temp').innerHTML=message;
+
+    }
+  }
+
+  </script>
+  <script src="bootstrap.bundle.min.js"></script>
+
+  <!-- Core plugin JavaScript-->
+  <script src="jquery.easing.min.js"></script>
+
+  <!-- Custom scripts for all pages-->
+  <script src="sb-admin-2.min.js"></script>
+</body>
+
+</html>

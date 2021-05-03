@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>WIFI SMART AUDIO SWITCH</title>
+
+  <!-- Custom fonts for this template -->
+  <link rel="icon" href="favicon.ico" type="image/gif" sizes="16x16">
+  <link href="font.css" rel="stylesheet">
+
+  <!-- Custom styles for this template-->
+  <link href="sb-admin-2.min.css" rel="stylesheet"/>
+</head>
+
+<body id="page-top" onload="javascript:start();">
+  <!-- Page Wrapper -->
+  <div id="wrapper">
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+      <!-- Sidebar - Brand -->
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
+      <div class="sidebar-brand-icon">
+          <img src="favicon.ico" width="32px"/>
+      </div>
+      <div class="sidebar-brand-text mx-1">WIFI SMART AUDIO SWITCH</div>
+      </a>
+  
+      <!-- Divider -->
+      <hr class="sidebar-divider my-0">
+  
+      <!-- Nav Item - Dashboard -->
+      <li class="nav-item ">
+        <a class="nav-link" href="/">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Dashboard</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="setting_ruangan.html">
+              <i class="fas fa-fw fa-tachometer-alt"></i>
+              <span>Ruangan</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="setting_jadwal.html">
+              <i class="fas fa-fw fa-tachometer-alt"></i>
+              <span>Jadwal</span>
+          </a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="setting_nada.html">
+              <i class="fas fa-fw fa-tachometer-alt"></i>
+              <span>Nada</span>
+          </a>
+        </li>
+        <!-- Divider -->
+        <hr class="sidebar-divider">
+        <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#pengaturan" aria-expanded="true" aria-controls="collapseTwo">
+            <span>Pengaturan</span>
+        </a>
+        <div id="pengaturan" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item" href="setting_jam.html">Waktu dan tanggal</a>
+            <a class="collapse-item" href="setting_wifi.html">Wifi</a>
+            </div>
+        </div>
+      </li>
+      <!-- Divider -->
+      <hr class="sidebar-divider d-none d-md-block">
+  
+  
+      <!-- Sidebar Toggler (Sidebar) -->
+      <div class="text-center d-none d-md-inline">
+      <button class="rounded-circle border-0" id="sidebarToggle"></button>
+      </div>
+  
+  </ul> 
+    <!-- Sidebar -->
+    
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+      <!-- Main Content -->
+      <div id="content">
+
+        <!-- Topbar -->
+        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+          <!-- Sidebar Toggle (Topbar) -->
+          <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+            <i class="fa fa-bars"></i>
+          </button>
+
+          <!-- Topbar Search -->
+          <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+            <b id="connectionState" >Terhubung</b>
+            <div class="input-group">
+              <h5 id="lblIP">IP Address <br>
+              192.168.4.1</h5> 
+            </div>
+          </form>
+          <!-- Topbar Navbar -->
+          <ul class="navbar-nav ml-auto">
+
+            <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+            <li class="nav-item dropdown no-arrow d-sm-none">
+              <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-search fa-fw"></i>
+              </a>
+              <!-- Dropdown - Messages -->
+              <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
+                <form class="form-inline mr-auto w-100 navbar-search">
+                  <div class="input-group">
+                    <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                      <button class="btn btn-primary" type="button">
+                        <i class="fas fa-search fa-sm"></i>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </li>
+            <h5>
+            <div class='info'>
+              <span id='day'></span>/<span id='month'></span>/<span id='year'></span><span> </span>
+              <span id='hour'></span>:<span id='minute'></span>:<span id='second'></span><span> </span>
+              <span id='temp'></span><span>C</span><br>
+
+            </div>
+            </h5>
+          </ul>
+
+        </nav>
+        <!-- End of Topbar -->
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+
+          <!-- Page Heading -->
+          <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h5 class="mb-0 text-gray-800">Pengaturan</h5>
+          </div>
+
+          <!-- Content Row -->
+          
+          <!-- Content Row -->
+
+          <div class="row">
+
+            <!-- Area Chart -->
+            <div class="col-lg-11">
+              <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                  <h6 class="m-0 font-weight-bold text-primary">Nada Bel <span class="glyphicon glyphicon-asterisk"></span></h6>                
+                  <button class='btn btn-success btn-sm' type='button' id="btnTambah">Tambah</button>  
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                  <table class="table table-hover" >
+                    <thead class="thead-dark">
+                      <tr>
+                        <th>No.</th>
+                        <th>Nada</th>
+                        <th>Aksi</th>
+                      </tr>
+                      <tr id="trAddRow" style="display: none;">
+                        <td id="lno">&nbsp;</td>
+                        <td>
+                          <input class='form-control-file' required style="width:100px !important;display:inline-table" type='file' name='fupload' id = 'fupload' value='' accept="audio/mp3;capture=microphone" />
+                          <img id="btnPlay" src="play.png" style="width: 24px;float: right;"/>
+                          <img id="btnStop" src="stop.png" style="width: 24px;float: right;display: none;"/>
+                        </td> 
+                        <td>
+                          <button class='btn btn-secondary btn-sm' type='button' id="btnBatal">Batal</button>  
+                          <button class='btn btn-primary btn-sm' type='button' id="btnSimpan">Simpan</button>  
+                        </td> 
+                      </tr>
+                    </thead>
+                    <tbody id="nadaContainer">
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Content Row -->
+        </div>
+        <!-- /.container-fluid -->
+      </div>
+      <!-- End of Main Content -->
+      
+      <footer class="sticky-footer bg-white">
+        <div class="container my-auto">
+          <div class="copyright text-center my-auto">
+            <span>Copyright &copy; CV. Mitra Sentosa Teknologi 2020</span>
+          </div>
+        </div>
+      </footer>
+      <!-- Footer -->
+
+      <!-- End of Footer -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+  </div>
+  <!-- End of Page Wrapper -->
+
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+  <!-- Logout Modal-->
+  <div class="modal fade" id="ruanganModal" tabindex="-1" role="dialog" aria-labelledby="ruanganModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <select class="form-control" id="selectRooms" disabled=true>
+            <option data-value="" value="0">Pilih Ruangan</option>
+            <option data-value="" value="1">Semua Ruangan</option>
+            <option data-value="" value="99">Custom</option>
+          </select>
+          &nbsp;
+          <form class="form-inline" id="formRooms" style="display:none">
+            <div class="form-group mb-2">
+              <label for="nama_custom">Nama : </label>
+              <input class='form-control' type='text' name='roomsName' id = 'roomsName'/>
+            </div>
+          </form>
+          &nbsp;
+          <button class="btn btn-warning btn-sm" style="display: none;" id="btnUbahRuangan" type="button">Ubah</button>
+          <button class="btn btn-danger btn-sm" style="display: none;" id="btnHapusRuangan" type="button">Hapus</button>
+          <button class="btn btn-primary btn-sm" style="display: none;" id="btnSimpanRuangan" type="button">Simpan</button>
+          <button class="btn btn-secondary btn-sm" style="display: none;" id="btnBatalRuangan" type="button">Batal</button>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-header" style="display: flex; justify-content: flex-end;">
+          <table id="checkboxall" style="display:none">
+            <tr>
+              <td style="padding-bottom: 13px;">
+                <b>Semua Ruangan</b>
+              </td>
+              <td>
+                <label class="switch">
+                  <input type="checkbox" id="speaker_all" class="switch-input" >
+                  <span class="switch-label" data-on="on" data-off="Off"></span>
+                <span class="switch-handle"></span>
+                </label>      
+              </td>
+            </tr>
+          </table>
+          
+        </div>
+        <div class="modal-body">
+          <div id="buttonContainer" style="pointer-events: none;display: block;">
+            
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-sm" type="button" data-dismiss="modal">Batal</button>
+          <button class="btn btn-primary btn-sm" type="button" id="btnSaveRooms">Pilih</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Hapus
+            </div>
+            <div class="modal-body" id="deleteModalBody">
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Batal</button>
+                <a class="btn btn-sm  btn-danger btn-ok" id="btnConfirmDelete">Hapus</a>
+            </div>
+        </div>
+    </div>
+  </div>
+  <!-- Bootstrap core JavaScript-->
+  
+  <script src="jquery.min.js"></script>
+  <script src="bootstrap.bundle.min.js"></script>
+
+  <!-- Core plugin JavaScript-->
+  <script src="jquery.easing.min.js"></script>
+
+  <!-- Custom scripts for all pages-->
+  <script src="sb-admin-2.min.js"></script>
+  
+  <script type="text/javascript">
+    
+    var val="";
+     for (var i=0;i<40;i++){
+       val+="<label style='border:1px solid #727a7c;text-align:center;padding:5px;margin:5px;width:80px'><pre>Ruangan "+(parseInt(i)+1)+"</pre><label class='switch' ><input type='checkbox' id='speaker_"+i+"' name='frooms' class='switch-input checkbox'><span class='switch-label' data-on='on' data-off='off'></span><span class='switch-handle'></span></label></label>";
+     }
+     $("#buttonContainer").html(val);
+
+
+    var websock;
+    var myarray;
+    function start() {
+      websock = new WebSocket('ws://' + window.location.hostname + ':81/');
+      websock.onopen = function(evt) { 
+        console.log('websock open');
+        websock.send("request_data");
+      };
+     websock.onclose = function(evt) { console.log('websock close'); };
+     websock.onerror = function(evt) { console.log(evt); };
+     websock.onmessage = function(evt) {
+       console.log(evt);
+       var e = document.getElementById('ledstatus');
+       if (evt.data.includes("waktu__")){
+        var str=evt.data.replace("waktu__","");
+        var w  = str.split(';')[0].split(",");
+        var temp = str.split(';')[1];
+        var d = new Date(w[0], w[1], w[2], w[3], w[4], w[5]);
+        
+        var dd = d.getDate();
+        var mm = d.getMonth();
+        var yy = d.getFullYear();
+        var months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "December"];
+        var namabulan = months[mm];
+        var hari = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+        var namahari = hari[d.getDay()];
+        setInterval(function() {
+
+        //var currentTime = new Date();
+        var currentTime = d;
+        d.setSeconds(d.getSeconds()+1);
+        var hours = currentTime.getHours();
+        var minutes = currentTime.getMinutes();
+        var seconds = currentTime.getSeconds();
+
+        // Add leading zeros
+        hours = (hours < 10 ? "0" : "") + hours;
+        minutes = (minutes < 10 ? "0" : "") + minutes;
+        seconds = (seconds < 10 ? "0" : "") + seconds;
+
+        // Compose the string for display
+        var currentTimeString = hours + ":" + minutes + ":" + seconds+"</br>"+namahari+", "+dd+" "+namabulan+" "+yy;
+        $(".info").html(currentTimeString);
+
+        }, 1000);
+        
+       }else if (evt.data.includes("songs__")){
+        if (evt.data.includes(",")){
+          var str=evt.data.replace("songs__","");
+          var myarray  = str.split(',');
+          var tr="";
+          
+          for(var i = 0; i < myarray.length; i++){
+            var btnDelete = "<button type='button' class='btn btn-danger btn-sm' id='btnDelete_"+i+"'>Hapus</button>";
+            tr += "<tr><td id='lno_"+i+"'>"+parseInt(i+1)+"</td><td id='lsong_"+i+"'>" +myarray[i]+ "<img id='btnPlay_"+i+"' src='play.png' style='width: 24px;float: right'/><img id='btnStop_"+i+"' src='stop.png' style='width: 24px;float: right;display:none'/></td><td>"+btnDelete+"</td></tr>";
+          }
+          $("#nadaContainer").html(tr);
+        }
+        $("[id^=btnPlay]").click(function(){
+          if ($(this).prop("id").includes("_")){  
+            var i = $(this).attr('id').split("_")[1];
+            var nada = $("#lsong_"+i).html().split("<img")[0];
+            websock.send("play_" + nada);
+            $("#btnPlay_"+i).hide();
+            $("#btnStop_"+i).show();
+          }else{
+            $("#btnPlay").hide();
+            $("#btnStop").show();
+            websock.send("play_" + $("#selectSong").val());
+          }
+          
+        });
+        $("[id^=btnStop]").click(function(){
+          if ($(this).prop("id").includes("_")){  
+            var i = $(this).attr('id').split("_")[1];
+            $("#btnPlay_"+i).show();
+            $("#btnStop_"+i).hide();
+          }else{
+            $("#btnPlay").show();
+            $("#btnStop").hide();
+          }
+          websock.send("stop_");
+        });
+
+        $("[id^=btnDelete_]").click(function(){
+          var i = $(this).attr('id').split("_")[1];
+          var nama = $("#lsong_"+i).html().split("<img ")[0];
+          var data = nama;
+          console.log(data);
+          $("#deleteModalBody").html("Apakah anda yakin ingin menghapus nada " + nama);
+          $('#delete-modal').modal('toggle');
+          $("#btnConfirmDelete").click(function(){
+            websock.send("deleteSongs_"+data);
+            $('#delete-modal').modal('toggle');
+          });  
+        });
+        console.log("songs :" + myarray[i]);
+        
+       }else if (evt.data.includes("udah_")){
+        $("[id^=btnPlay]").each(function(){
+          if ($(this).prop("id").includes("_")){  
+            var i = $(this).attr('id').split("_")[1];
+            $("#btnPlay_"+i).show();
+            $("#btnStop_"+i).hide();
+          }else{
+            $("#btnPlay").show();
+            $("#btnStop").hide();
+          }
+        });
+        
+       }else {
+         console.log('unknown event');
+       }
+       
+      
+     };
+     //process();
+     
+    }
+
+
+    $("#btnTambah").click(function(){
+      $("#trAddRow").show();
+      $("#fname").prop('disabled', false);
+      $(this).prop('disabled', true);
+      $("#nadaContainer").css("pointer-events","none");
+      $("#selectRooms").prop("disabled",false);
+    })
+
+    $("#btnBatal").click(function(){
+      $("#fname").val("");
+      $('input[name="fdays"]').each(function() {
+        $(this).prop("checked",false);
+      });
+      
+      $("#ftime").val("");
+      $("#selectSong").val("0");
+      $("#btnRuangan").html("Pilih Ruangan");
+      
+      $("#btnTambah").prop('disabled', false);
+      
+      $("#selectRooms").prop("disabled",true);
+      $("#trAddRow").hide();
+      
+      $("#nadaContainer").css("pointer-events","");
+    })
+    $("#btnSimpan").click(function(){
+      var state="save_";
+      var file_data = $('#fupload').prop('files')[0];   
+      var form_data = new FormData();                  
+      form_data.append('file', file_data);
+      console.log(form_data);                            
+      $.ajax({
+          url: '/upload', // point to server-side PHP script 
+          dataType: 'text',  // what to expect back from the PHP script, if anything
+          cache: false,
+          contentType: false,
+          processData: false,
+          data: form_data,                         
+          type: 'post',
+          success: function(res){
+              alert(res); // display response from the PHP script, if any
+          }
+      });
+      $("#btnTambah").prop('disabled', false);
+      $("#trAddRow").hide();
+      $("#nadaContainer").css("pointer-events","");
+    })
+
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>WIFI SMART AUDIO SWITCH</title>
+
+  <!-- Custom fonts for this template -->
+  <link rel="icon" href="favicon.ico" type="image/gif" sizes="16x16">
+  <link href="font.css" rel="stylesheet">
+
+  <!-- Custom styles for this template-->
+  <link href="sb-admin-2.min.css" rel="stylesheet"/>
+</head>
+
+<body id="page-top" onload="javascript:start();">
+  <!-- Page Wrapper -->
+  <div id="wrapper">
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+      <!-- Sidebar - Brand -->
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
+      <div class="sidebar-brand-icon">
+          <img src="favicon.ico" width="32px"/>
+      </div>
+      <div class="sidebar-brand-text mx-1">WIFI SMART AUDIO SWITCH</div>
+      </a>
+  
+      <!-- Divider -->
+      <hr class="sidebar-divider my-0">
+  
+      <!-- Nav Item - Dashboard -->
+      <li class="nav-item active">
+      <a class="nav-link" href="/">
+          <i class="fas fa-fw fa-tachometer-alt"></i>
+          <span>Dashboard</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="setting_ruangan.html">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Ruangan</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="setting_jadwal.html">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Jadwal</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="setting_nada.html">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Nada</span>
+        </a>
+      </li>
+      <!-- Divider -->
+      <hr class="sidebar-divider">
+      <li class="nav-item">
+      <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#pengaturan" aria-expanded="true" aria-controls="collapseTwo">
+          <span>Pengaturan</span>
+      </a>
+      <div id="pengaturan" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+          <a class="collapse-item" href="setting_jam.html">Waktu dan tanggal</a>
+          <a class="collapse-item" href="setting_wifi.html">Wifi</a>
+          </div>
+      </div>
+      </li>
+      <!-- Divider -->
+      <hr class="sidebar-divider d-none d-md-block">
+  
+  
+      <!-- Sidebar Toggler (Sidebar) -->
+      <div class="text-center d-none d-md-inline">
+      <button class="rounded-circle border-0" id="sidebarToggle"></button>
+      </div>
+  
+  </ul> 
+    <!-- Sidebar -->
+    
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+      <!-- Main Content -->
+      <div id="content">
+
+        <!-- Topbar -->
+        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+          <!-- Sidebar Toggle (Topbar) -->
+          <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+            <i class="fa fa-bars"></i>
+          </button>
+
+          <!-- Topbar Search -->
+          <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+            <b id="connectionState" >Terhubung</b>
+            <div class="input-group">
+              <h5 id="lblIP">IP Address <br>
+              192.168.4.1</h5> 
+            </div>
+          </form>
+
+          <!-- Topbar Navbar -->
+          <ul class="navbar-nav ml-auto">
+
+            <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+            <li class="nav-item dropdown no-arrow d-sm-none">
+              <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-search fa-fw"></i>
+              </a>
+              <!-- Dropdown - Messages -->
+              <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
+                <form class="form-inline mr-auto w-100 navbar-search">
+                  <div class="input-group">
+                    <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                      <button class="btn btn-primary" type="button">
+                        <i class="fas fa-search fa-sm"></i>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </li>
+            <h5>
+            <div class='info'>
+              <span id='day'></span>/<span id='month'></span>/<span id='year'></span><span> </span>
+              <span id='hour'></span>:<span id='minute'></span>:<span id='second'></span><span> </span>
+              <span id='temp'></span><span>C</span><br>
+
+            </div>
+            </h5>
+          </ul>
+
+        </nav>
+        <!-- End of Topbar -->
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+          <!-- Content Row -->
+          
+          <div class="row">
+
+            <!-- Area Chart -->
+            <div class="col-lg-11">
+              <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <div>
+                      <b>Jadwal Per Hari : </b>
+                    </div>
+                    <div>
+                      
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="radioHari" id="radioHari1" value="Senin">
+                        <label class="form-check-label" for="radioHari1">Senin</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="radioHari" id="radioHari2" value="Selasa">
+                        <label class="form-check-label" for="radioHari2">Selasa</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="radioHari" id="radioHari3" value="Rabu">
+                        <label class="form-check-label" for="radioHari3">Rabu</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="radioHari" id="radioHari4" value="Kamis">
+                        <label class="form-check-label" for="radioHari4">Kamis</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="radioHari" id="radioHari5" value="Jumat">
+                        <label class="form-check-label" for="radioHari5">Jumat</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="radioHari" id="radioHari6" value="Sabtu">
+                        <label class="form-check-label" for="radioHari6">Sabtu</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="radioHari" id="radioHari0" value="Minggu">
+                        <label class="form-check-label" for="radioHari0">Minggu</label>
+                      </div>
+                    </div>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                  <table class="table table-hover" >
+                    <thead class="thead-dark">
+                      <tr>
+                        <th>No.</th>
+                        <th>Nama Event</th>
+                        <th>Hari</th>
+                        <th>Jam</th>
+                        <th>Nada</th>
+                        <th>Ruangan</th>
+                      </tr>
+                    </thead>
+                    <tbody id="jadwalContainer">
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Content Row -->
+
+          <div class="row">
+
+            <!-- Area Chart -->
+            <div class="col-lg-11">
+              <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <b>Bel Manual</b>
+                    <div>
+                      <button type='button' class="btn btn-info btn-sm" data-toggle="modal" data-target="#ruanganModal" id="btnRuangan">Semua Ruangan</button>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="radioBel" id="radioBelOn" value="bel_on">
+                        <label class="form-check-label" for="radioBelOn">On</label>
+                      </div>
+                      <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="radioBel" id="radioBelOff" value="bel_off" checked="true">
+                        <label class="form-check-label" for="radioBelOff">Off</label>
+                      </div>
+                    </div>
+                    
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                  <table class="table table-hover" >
+                    <thead class="thead-dark">
+                      <tr>
+                        <th>No.</th>
+                        <th>Nada</th>
+                      </tr>
+                    </thead>
+                    <tbody id="nadaContainer">
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Content Row -->
+        </div>
+        <!-- /.container-fluid -->
+      </div>
+      <!-- End of Main Content -->
+      
+      <footer class="sticky-footer bg-white">
+        <div class="container my-auto">
+          <div class="copyright text-center my-auto">
+            <span>Copyright &copy; CV. Mitra Sentosa Teknologi 2020</span>
+          </div>
+        </div>
+      </footer>
+      <!-- Footer -->
+
+      <!-- End of Footer -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+  </div>
+  <!-- End of Page Wrapper -->
+
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+  <!-- Logout Modal-->
+  <div class="modal fade" id="ruanganModal" tabindex="-1" role="dialog" aria-labelledby="ruanganModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <select class="form-control" id="selectRooms">
+            <option data-value="" value="1">Semua Ruangan</option>
+            <option data-value="" value="99">Custom</option>
+          </select>
+          &nbsp;
+          <form class="form-inline" id="formRooms" style="display:none">
+            <div class="form-group mb-2">
+              <label for="nama_custom">Nama : </label>
+              <input class='form-control' type='text' name='roomsName' id = 'roomsName'/>
+            </div>
+          </form>
+          &nbsp;
+          <button class="btn btn-warning btn-sm" style="display: none;" id="btnUbahRuangan" type="button">Ubah</button>
+          <button class="btn btn-danger btn-sm" style="display: none;" id="btnHapusRuangan" type="button">Hapus</button>
+          <button class="btn btn-primary btn-sm" style="display: none;" id="btnSimpanRuangan" type="button">Simpan</button>
+          <button class="btn btn-secondary btn-sm" style="display: none;" id="btnBatalRuangan" type="button">Batal</button>
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-header" style="display: flex; justify-content: flex-end;">
+          <table id="checkboxall" style="display:none">
+            <tr>
+              <td style="padding-bottom: 13px;">
+                <b>Semua Ruangan</b>
+              </td>
+              <td>
+                <label class="switch">
+                  <input type="checkbox" id="speaker_all" name="frooms" class="switch-input" >
+                  <span class="switch-label" data-on="on" data-off="Off"></span>
+                <span class="switch-handle"></span>
+                </label>      
+              </td>
+            </tr>
+          </table>
+          
+        </div>
+        <div class="modal-body">
+          <div id="buttonContainer" style="pointer-events: none;display: block;">
+            
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary btn-sm" type="button" data-dismiss="modal">Batal</button>
+          <button class="btn btn-primary btn-sm" type="button" id="btnSaveRooms">Pilih</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="delete-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Hapus
+            </div>
+            <div class="modal-body" id="deleteModalBody">
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Batal</button>
+                <a class="btn btn-sm  btn-danger btn-ok" id="btnConfirmDelete">Hapus</a>
+            </div>
+        </div>
+    </div>
+  </div>
+  <!-- Bootstrap core JavaScript-->
+  
+  <script src="jquery.min.js"></script>
+  <script src="bootstrap.bundle.min.js"></script>
+
+  <!-- Core plugin JavaScript-->
+  <script src="jquery.easing.min.js"></script>
+
+  <!-- Custom scripts for all pages-->
+  <script src="sb-admin-2.min.js"></script>
+  
+  <script type="text/javascript">
+    
+    $('[id^=radioHari]').change(function(){
+      websock.send("get_jadwal");
+    });
+    var val="";
+     for (var i=0;i<32;i++){
+      val+="<label style='border:1px solid #727a7c;text-align:center;padding:5px;margin:5px;width:80px'><pre id='pre_"+(parseInt(i)+1)+"'><input type='text' id='nama_"+(parseInt(i)+1)+"' class='form-control bg-light small' style='width:54px;display:none' value=''></input><b id='label_"+(parseInt(i)+1)+"'>Ruangan "+(parseInt(i)+1)+"</b></pre><label class='switch' ><input type='checkbox' id='speaker_"+i+"' name='frooms' class='switch-input checkbox'><span class='switch-label' data-on='on' data-off='off'></span><span class='switch-handle'></span></label></label>";
+     }
+     $("#buttonContainer").html(val);
+
+
+    var websock;
+    var myarray;
+    function start() {
+      websock = new WebSocket('ws://' + window.location.hostname + ':81/');
+      websock.onopen = function(evt) { 
+        console.log('websock open');
+        websock.send("request_data");
+      $("#connectionState").css("color","greenyellow");
+      $("#connectionState").html("Terhubung");
+      };
+     websock.onclose = function(evt) { 
+       console.log('websock close'); 
+      $("#connectionState").css("color","red");
+      $("#connectionState").html("Terputus");
+    };
+     websock.onerror = function(evt) { 
+       console.log(evt); 
+      $("#connectionState").css("color","red");
+      $("#connectionState").html("Terputus");
+    };
+     websock.onmessage = function(evt) {
+       console.log(evt);
+       var e = document.getElementById('ledstatus');
+       if (evt.data === 'ledon') {
+         e.style.color = 'red';
+       }
+       else if (evt.data === 'ledoff') {
+         e.style.color = 'black';
+       }else if (evt.data.includes("jadwal__")){
+        myarray = evt.data.split('\n');
+        var tr="";
+        for(var i = 0; i < myarray.length; i++){
+          var str = myarray[i];
+          if (str.includes(",")){
+            arr = myarray[i].split(";");
+            var nama = arr[0].replace("jadwal__","");
+            var hari = arr[1];
+            var jam = arr[2];
+            var nada = arr[3];
+            var ruangan = arr[4].replace("\n","");
+            var btnRuangan ="<button type='button' class='btn btn-info btn-sm' data-toggle='modal' data-target='#ruanganModal' id='btnRuangan_"+i+"'>"+ruangan+"</button>";
+            hari=hari.substr(0,hari.length-1);
+            arrHari = hari.split(",");
+            var strHari="";
+            for (x=0;x<arrHari.length;x++){
+              if (arrHari[x].endsWith("_on")){
+                strHari+=arrHari[x].replace("_on","").replace("chk","").toUpperCase()+"<br>";
+              }
+            }
+            
+            tr += "<tr id='tr_"+i+"'><td id='lno_"+i+"'>"+parseInt(i+1)+"</td><td id='lname_"+i+"'>" +nama+ "</td><td id='ldays_"+i+"'>" +strHari+ "</td><td id='ltime_"+i+"''>" +jam+ "</td><td id='lsong_"+i+"'>" +nada+ "<img id='btnPlay_"+i+"' src='play.png' style='width: 24px;float: right'/><img id='btnStop_"+i+"' src='stop.png' style='width: 24px;float: right;display:none'/></td><td>"+btnRuangan+"</td></tr>";
+          }
+          console.log("jadwal :" + myarray[i]);
+          
+          $("#jadwalContainer").html(tr);
+          var hariIni="";
+          $("[id^=radioHari]").each(function(){
+            if (this.checked){
+              hariIni=this.value;
+            }
+          })
+          $('[id^=ldays_]').each(function(){
+            if($(this).html().toUpperCase().indexOf(hariIni.toUpperCase())==-1){
+              var arr=this.id.split("_");
+              var id = arr[1];
+              $("#tr_"+id).css("display","none");
+            }
+          });
+        }
+        
+        $("[id^=btnPlay]").click(function(){
+          if ($(this).prop("id").includes("_")){  
+            var i = $(this).attr('id').split("_")[1];
+            var nada = $("#lsong_"+i).html().split("<img")[0];
+            websock.send("play_" + nada);
+            $("#btnPlay_"+i).hide();
+            $("#btnStop_"+i).show();
+          }else{
+            $("#btnPlay").hide();
+            $("#btnStop").show();
+            websock.send("play_" + $("#selectSong").val());
+          }
+          
+        });
+        $("[id^=btnStop]").click(function(){
+          if ($(this).prop("id").includes("_")){  
+            var i = $(this).attr('id').split("_")[1];
+            $("#btnPlay_"+i).show();
+            $("#btnStop_"+i).hide();
+          }else{
+            $("#btnPlay").show();
+            $("#btnStop").hide();
+          }
+          websock.send("stop_");
+        });
+
+        $('[id^=btnRuangan]').click(function(){
+          var n = $(this).html().replace("\n","");
+          $('#selectRooms').css("pointer-events","");
+          $('#selectRooms option').each(function(){
+            if ($(this).text() == n) {
+              $(this).prop("selected",true);
+              $("#selectRooms").change();
+            }
+          });
+          
+        })
+
+       }else if (evt.data.includes("rooms__")){
+        myarray = evt.data.split('\n');
+        var tr="";
+        for(var i = 0; i < myarray.length; i++){
+          var str = myarray[i];
+          if (str.includes(",")){
+            var nama = myarray[i].split("~")[0].split(":")[1];
+            var ruangan = myarray[i].split("~")[1];
+            var exists = false; 
+            $('#selectRooms option').each(function(){
+              if ($(this).html()== nama) {
+                exists = true;
+                $(this).attr("data-value", ruangan);
+              }
+            });
+            if (!exists){
+              $('#selectRooms').append($("<option></option>")
+                        .attr("data-value", ruangan)
+                        .attr("value", i+2)
+                        .text(nama)); 
+            }
+            if (nama==$("#btnRuangan").html()){
+              $("#selectRooms").val(i+2);
+              $("#selectRooms").change();
+            }
+          }
+          
+          $("#selectRooms").change();
+          $("#btnRuangan").html($("#selectRooms option:selected").text());
+          //$('input[name="radioBel"]').change();
+          //triggerSelectRooms();
+          console.log("rooms :" + myarray[i]);
+        }
+       }else if (evt.data.includes("roomsname__")){
+        var str=evt.data.replace("roomsname__","");
+        myarray = str.split('\n');
+        var tr="";
+        for(var i = 0; i < myarray.length; i++){
+          var str = myarray[i];
+          if (str.includes(",")){
+            var arrRooms = str.split(",");
+            for (var x = 0; x < arrRooms.length;x++){
+              var idRoom = arrRooms[x].split(":")[0];
+              var id = idRoom.split("_")[1];
+              var namaRoom = arrRooms[x].split(":")[1];
+              $("#label_"+id).html(namaRoom);
+              $("nama_"+id).val(namaRoom);
+
+            }
+          }
+          
+          //triggerSelectRooms();
+          console.log("rooms :" + myarray[i]);
+        }
+      }else if (evt.data.includes("speakerstate__")){
+        var str=evt.data.replace("speakerstate__","");
+        var roomsName = str.split(";")[1];
+        $('#selectRooms option').each(function(){
+          if ($(this).text() == roomsName) {
+            $(this).prop("selected",true);
+            $("#selectRooms").change();
+          }
+        });
+        $("#btnRuangan").html($("#selectRooms option:selected").text());
+        if (str.startsWith("speaker_on")){
+          $("#radioBelOn").prop("checked",true);
+        }else{
+          $("#radioBelOff").prop("checked",true);
+        }
+
+      }else if (evt.data.includes("waktu__")){
+        var str=evt.data.replace("waktu__","");
+        var w  = str.split(';')[0].split(",");
+        var temp = str.split(';')[1];
+        var d = new Date(w[0], w[1], w[2], w[3], w[4], w[5]);
+        
+        var dd = d.getDate();
+        var mm = d.getMonth();
+        var yy = d.getFullYear();
+        var months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "December"];
+        var namabulan = months[mm];
+        var hari = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+        var namahari = hari[d.getDay()];
+        $("#radioHari"+d.getDay()).prop("checked",true);
+        $("#radioHari"+d.getDay()).change();
+
+        setInterval(function() {
+
+        //var currentTime = new Date();
+        var currentTime = d;
+        d.setSeconds(d.getSeconds()+1);
+        var hours = currentTime.getHours();
+        var minutes = currentTime.getMinutes();
+        var seconds = currentTime.getSeconds();
+
+        // Add leading zeros
+        hours = (hours < 10 ? "0" : "") + hours;
+        minutes = (minutes < 10 ? "0" : "") + minutes;
+        seconds = (seconds < 10 ? "0" : "") + seconds;
+
+        // Compose the string for display
+        var currentTimeString = hours + ":" + minutes + ":" + seconds+"</br>"+namahari+", "+dd+" "+namabulan+" "+yy;
+        $(".info").html(currentTimeString);
+
+        }, 1000);
+        
+       }else if (evt.data.includes("songs__")){
+        if (evt.data.includes(",")){
+          var str=evt.data.replace("songs__","");
+          var myarray  = str.split(',');
+          var tr="";
+          
+          for(var i = 0; i < myarray.length; i++){
+            tr += "<tr><td id='lno_"+i+"'>"+parseInt(i+1)+"</td><td id='lsong_"+i+"'>" +myarray[i]+ "<img id='btnPlay_"+i+"' src='play.png' style='width: 24px;float: right'/><img id='btnStop_"+i+"' src='stop.png' style='width: 24px;float: right;display:none'/></td></tr>";
+          }
+          $("#nadaContainer").html(tr);
+        }
+        $("[id^=btnPlay]").click(function(){
+          if ($(this).prop("id").includes("_")){  
+            var i = $(this).attr('id').split("_")[1];
+            var nada = $("#lsong_"+i).html().split("<img")[0];
+            websock.send("play_" + nada);
+            $("#btnPlay_"+i).hide();
+            $("#btnStop_"+i).show();
+          }else{
+            $("#btnPlay").hide();
+            $("#btnStop").show();
+            websock.send("play_" + $("#selectSong").val());
+          }
+          
+        });
+        $("[id^=btnStop]").click(function(){
+          if ($(this).prop("id").includes("_")){  
+            var i = $(this).attr('id').split("_")[1];
+            $("#btnPlay_"+i).show();
+            $("#btnStop_"+i).hide();
+          }else{
+            $("#btnPlay").show();
+            $("#btnStop").hide();
+          }
+          websock.send("stop_");
+        });
+
+        
+       }else if (evt.data.includes("udah_")){
+        $("[id^=btnPlay]").each(function(){
+          if ($(this).prop("id").includes("_")){  
+            var i = $(this).attr('id').split("_")[1];
+            $("#btnPlay_"+i).show();
+            $("#btnStop_"+i).hide();
+          }else{
+            $("#btnPlay").show();
+            $("#btnStop").hide();
+          }
+        });
+        
+       }else {
+         console.log('unknown event');
+       }
+       
+      
+     };
+     //process();
+     
+    }
+
+    
+    function triggerSelectRooms(){
+      $("#selectRooms").change(function(){
+        $('input[name="frooms"]').each(function(){
+            this.checked=false;
+        });
+        $("#buttonContainer").css("pointer-events","none");
+        $("#formRooms").hide();
+        $("#btnUbahRuangan").hide();
+        //$("#btnHapusRuangan").hide();
+        $("#btnSimpanRuangan").hide();
+        $("#btnBatalRuangan").hide();
+        $("#checkboxall").hide();
+        $("#speaker_all").checked=false;
+        $("#btnSaveRooms").html("Simpan");
+        if ($(this).val() == "1"){  
+          $('input[name="frooms"]').each(function(){
+            this.checked=true;
+            $("#buttonContainer").css("pointer-events","none");
+          });
+        }else if ($(this).val() == "99"){
+          $("#formRooms").show();
+          $("#buttonContainer").css("pointer-events","");  
+          $("#btnSaveRooms").html("Simpan & Pilih");
+          $("#checkboxall").show();
+        }else if ($(this).val() == "0"){
+          $("#btnSaveRooms").html("Simpan");
+        }else{
+          $("#btnUbahRuangan").show();
+          //$("#btnHapusRuangan").show();
+          $("#btnSaveRooms").html("Simpan");
+          $("#buttonContainer").css("pointer-events","none");
+          var ruangan = $("#selectRooms option:selected").attr("data-value");
+          if (ruangan!=""){
+            var arrRuangan = ruangan.split(",");
+            for (var i=0;i<arrRuangan.length;i++){
+              var speaker = arrRuangan[i];
+              var id=speaker.split("_")[1].split("_")[0];
+              if (speaker.endsWith("_on")){
+                $("#speaker_"+id).prop('checked', true);
+              }
+            }
+          }
+          
+        }    
+      });
+    }
+    $("#speaker_all").change(function(){
+      var b = this.checked;
+      $('input[name="frooms"]').each(function(){
+        this.checked=b;
+      });
+    })
+    $("#btnUbahRuangan").click(function(){
+      $("#selectRooms").css("pointer-events","none");
+      $("#buttonContainer").css("pointer-events","");
+      $("#btnSimpanRuangan").show();
+      $("#btnBatalRuangan").show();
+      $("#btnUbahRuangan").hide();
+      //$("#btnHapusRuangan").hide();
+      $("#btnTambah").prop('disabled', true);
+      $("#trAddRow").show();
+      $("#btnSaveRooms").prop('disabled', true);;
+      $("#checkboxall").show();
+    })
+    $("#btnHapusRuangan").click(function(){
+      var nama = $("#selectRooms option:selected").text();
+      var data = nama;
+      console.log(data);
+      $("#deleteModalBody").html("Apakah anda yakin ingin menghapus set ruangan " + nama);
+      $('#delete-modal').modal('toggle');
+      $("#btnConfirmDelete").click(function(){
+        websock.send("deleteRooms_"+data);
+        $('#delete-modal').modal('toggle');
+      });
+      $("#selectRooms").css("pointer-events","");
+      $("#btnSimpanRuangan").hide();
+      $("#btnBatalRuangan").hide();
+      $("#btnUbahRuangan").show();
+      //$("#btnHapusRuangan").show();
+      $("#selectRooms").val(0);
+      $("#selectRooms").change();
+    })
+    $("#btnBatalRuangan").click(function(){
+      $("#selectRooms").css("pointer-events","");
+      $("#buttonContainer").css("pointer-events","none");
+      $("#btnSimpanRuangan").hide();
+      $("#btnBatalRuangan").hide();
+      $("#btnUbahRuangan").show();
+      //$("#btnHapusRuangan").show();
+      $("#checkboxall").hide();
+      $("#selectRooms").change();
+      $("#btnSaveRooms").prop('disabled', false);;
+    })
+    $("#btnSimpanRuangan").click(function(){
+      saveRooms(true);
+      $("#selectRooms").css("pointer-events","");
+      $("#buttonContainer").css("pointer-events","none");
+      $("#checkboxall").hide();
+      $("#btnSimpanRuangan").hide();
+      $("#btnBatalRuangan").hide();
+      $("#btnUbahRuangan").show();
+      //$("#btnHapusRuangan").show();
+      $("#btnSaveRooms").prop('disabled', false);;
+    })
+    triggerSelectRooms();
+    
+    $("#btnSaveRooms").click(function(){
+      if ($("#selectRooms").val()=="99"){
+        $("#roomsName").val($("#roomsName").val().replace(/[_\W]+/g, ""));
+        if ($("#roomsName").val()==""){
+          $("#roomsName").css("border","1px solid red");
+          $("#roomsName").focus();
+          return;
+        }
+        var ketemu = false;
+        var n = $("#roomsName").val();
+        $('#selectRooms option').each(function(){
+          if ($(this).text() == n) {
+            ketemu=true;
+          }
+        });
+        if (ketemu){
+          $("#roomsName").css("border","1px solid red");
+          $("#roomsName").focus();
+          return;
+        }
+        saveRooms(false);
+        $("#roomsName").css("border","1px solid #d1d3e2");
+        $("#roomsName").val("");
+        $('#ruanganModal').modal('toggle');
+              
+      }else if ($("#selectRooms").val()=="0"){
+        $("#selectRooms").css("border","1px solid red");
+        $("#btnRuangan").html($("#selectRooms option:selected").text());
+      }else if ($("#selectRooms").val()=="1"){
+        $("#selectRooms").css("border","1px solid #d1d3e2");
+        $('#ruanganModal').modal('toggle');
+        $("#btnRuangan").html($("#selectRooms option:selected").text());
+      }else{
+        $("#btnRuangan").html($("#selectRooms option:selected").text());
+        $('#ruanganModal').modal('toggle');
+      }
+      $('input[name="radioBel"]').change();
+    });
+    
+    function saveRooms(ubah){
+      var command="addRooms_";
+      var nama =  $("#roomsName").val();
+      if (ubah){
+        command="updateRooms_"
+        nama = $("#selectRooms option:selected").text();
+      }
+      $("#btnRuangan").html(nama);
+      var data = "rooms:" +nama+"~";
+      $('input[name="frooms"]').each(function(){
+        var b = this.checked;
+        var strBool = "_off";
+        if (b){
+          strBool="_on";
+        }
+        data += this.id+strBool+",";
+      });
+      data=data.substr(0,data.length-1);
+      console.log(data +"\n");
+      websock.send(command+data+"\n");
+    }
+
+    
+    $('input[name="radioBel"]').change(function(){
+      var namaruangan=$("#btnRuangan").html();
+      var state=this.value;
+      var b = this.checked;
+      if (b){
+        if (state=="bel_on"){
+          $('input[name="frooms"]').each(function(){
+            var b = this.checked;
+            var strBool = "_off";     
+            if (b){
+              strBool="_on";
+            }
+            websock.send(this.id+strBool);
+            console.log(this.id+strBool); 
+          });
+          websock.send("changeState_speaker_on;"+namaruangan);
+        }else{
+          websock.send("speaker_all_off");
+          websock.send("changeState_speaker_off;"+namaruangan);
+        }
+      }
+    });
+    
+  </script>
+</body>
+
+</html>

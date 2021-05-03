@@ -1,0 +1,8 @@
+[
+    {"nomor": 1, "kelas": "R.", "jurusan": "Utama", "gedung": "B-1"},
+    {"nomor": 2, "kelas": "K.", "jurusan": "Depan", "gedung": "A-1"},
+    {"nomor": 3, "kelas": "K.", "jurusan": "Belakang", "gedung": "A-1"},
+    {"nomor": 4, "kelas": "K.", "jurusan": "Mandi", "gedung": "A-1"},
+    {"nomor": 5, "kelas": "M.", "jurusan": "Air", "gedung": "A-1"},
+    {"nomor": 6, "kelas": "R.", "jurusan": "Dapur", "gedung": "B-1"}
+]
