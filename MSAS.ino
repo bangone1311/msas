@@ -1,3 +1,5 @@
+#define CONFIG_ASYNC_TCP_USE_WDT 0
+
 #include <WiFi.h>
 #include <WiFiManager.h>         
 #include <ESPmDNS.h>
@@ -26,12 +28,16 @@ char buff[10];
 String message, XML,songs="",jadwal="0";
 String lastSd;
 String lastSt;
-boolean sends=true;
+boolean sends=false;
+int cj=0;
+String arrJadwal[50] = {"","","", "","","","","","","",  "","","", "","","","","","","",  "","","", "","","","","","","",  "","","", "","","","","","","",  "","","", "","","","","","",""  };
+
 RtcDS3231<TwoWire> Rtc(Wire);
 RtcDateTime now;
 LiquidCrystal_I2C lcd(0x27, 16, 2);  
 AudioFileSourceSD *source = NULL;
 AudioOutputI2S *output = NULL;
+//AudioOutputI2SNoDAC*output = NULL;
 AudioGeneratorMP3 *decoder = NULL;
 
 AudioOutputMixer *mixer;
@@ -42,6 +48,12 @@ char weekDay[][7] = {"MINGGU", "SENIN", "SELASA", "RABU", "KAMIS", "JUM'AT", "SA
 char monthYear[][4] = { "DES", "JAN", "FEB", "MAR", "APR", "MEI", "JUN", "JUL", "AGU", "SEP", "OKT", "NOV", "DES" };
 
 String namaJadwal="";
+String jamJadwal="";
+String sd ="";
+boolean isConnected=true;
+unsigned long previousMillis = 0;
+unsigned long interval = 30000;
+
 void buildXML(){
   RtcDateTime now = Rtc.GetDateTime();
   RtcTemperature temp = Rtc.GetTemperature();
@@ -93,10 +105,10 @@ int pcfCount = sizeof(pcf)/sizeof(pcf1);
 //int ss = sizeof(pin)/sizeof(pin[0]);
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length)
 {
-  //Serial.printf("webSocketEvent(%d, %d, ...)\r\n", num, type);
+  Serial.printf("webSocketEvent(%d, %d, ...)\r\n", num, type);
   switch(type) {
     case WStype_DISCONNECTED:
-      Serial.printf("[%u] Disconnected!\r\n", num);
+      //Serial.printf("[%u] Disconnected!\r\n", num);
       break;
     case WStype_CONNECTED:
       {
@@ -107,13 +119,12 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
     case WStype_TEXT:
       {
         String text = (char *) payload;
-        //Serial.println(text);
+        Serial.println(text);
         if (text.startsWith("play_")){
           text.replace("play_","");
           const char* string1 = text.c_str();
           //Serial.println(text);
           playFile(string1);
-          sends=false;
         }else if (text.startsWith("stop_")){
           stopPlayer();
         }else if (text.startsWith("save_")){
@@ -149,6 +160,19 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
           getTime();
         }else if (text.startsWith("get_jadwal")){
           getJadwal();
+          getTime();
+          getRooms();
+          getNamaRooms();
+        }else if (text.startsWith("get_nada")){
+          getSongs();
+        }else if (text.startsWith("get_data_bel_manual")){
+          getSongs();
+          getRooms();
+          getNamaRooms();
+          getSpeakerState();
+        }else if (text.startsWith("get_data_ruangan")){
+          getRooms();
+          getNamaRooms();
         }else if (text.startsWith("updateDate_")){
           text.replace("updateDate_","");
           updateDate(text);
@@ -158,6 +182,19 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
         }else if (text.startsWith("changeState_")){
           text.replace("changeState_","");
           changeSpeakerState(text);
+        }else if (text.startsWith("updateWifi_")){
+          text.replace("updateWifi_","");
+          updateWifi(text);
+        }else if (text.startsWith("getWifi_")){
+          getWifi();
+        }else if (text.startsWith("getSpeakerState_")){
+          getSpeakerState();
+        }else if (text.startsWith("setVolume_")){
+          text.replace("setVolume_","");
+          setVolume(text);
+        }else if (text.startsWith("restore_")){
+          text.replace("restore_","");
+          restore(text);
         }else{
           turnSpeaker(text);
         }
@@ -192,17 +229,56 @@ void setup() {
   
   startRTC();
   //RTC D3231
-
-//  WiFiManager wifiManager;
-//  wifiManager.autoConnect("MiSenTek WSAS", "B1sm1llah");
-  WiFi.softAP("MiSenTek WSAS", "B1sm1llah");
-  IPAddress myIP = WiFi.softAPIP();
-  Serial.print("AP IP address: ");
-  //Serial.println(myIP);
-//  while (WiFi.status() != WL_CONNECTED) {
-//    delay(500);
-//    Serial.print(".");
-//  }
+  lcd.init();           
+  lcd.backlight();
+  lcd.setCursor(4,0);
+  lcd.print("MiSenTek");
+  lcd.setCursor(0,1);
+  lcd.print("Digital-RoomCall");
+  
+  if(!SPIFFS.begin(true)){
+    lcd.setCursor(0,0);
+    lcd.print("SPIFFS Error!");
+    Serial.println("An Error has occurred while mounting SPIFFS");
+    return;
+  }
+  //WiFi.softAP("MiSenTek WSAS", "B1sm1llah");
+  File f2 = SPIFFS.open("/wifi.txt", "r");
+  if (!f2) {
+    Serial.println("open wifi failed");
+  }
+  String wifi="";
+  //Serial.println("open oke");
+  String ssid="Digital Room Call";
+  String pw ="12345678";
+  while(f2.available()) {
+    //Serial.println("mulai membaca wifi ");
+    String line = f2.readStringUntil('\n');
+    wifi += line;
+    Serial.println("isi wifi : " + wifi);
+  }
+  if (wifi.length()>0){
+    ssid=wifi.substring(0,wifi.indexOf(";"));
+    pw= wifi.substring(wifi.indexOf(";")+1,wifi.length());
+  }
+  
+  Serial.println("ssid : " + ssid);
+  WiFiManager wifiManager;
+  
+  wifiManager.setAPCallback(configModeCallback);
+  wifiManager.autoConnect((const char*)ssid.c_str(), (const char*)pw.c_str());
+//  Serial.print("AP IP address: ");
+//  //Serial.println(myIP);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Connected, IP :");
+  lcd.setCursor(1,1);
+  lcd.print(WiFi.localIP());
+  delay(5000);
   if (MDNS.begin("http://misentek.local/")) {
     //Serial.println("MDNS responder started");
   }
@@ -213,34 +289,64 @@ void setup() {
       //pcf[x].pinMode(i, OUTPUT);
     }
     if (pcf[x].begin()){
-      Serial.println(" PCF " + String(x)+" OK");
+      //Serial.println(" PCF " + String(x)+" OK");
     }else{
       //Serial.println(" PCF " + String(x)+" FAILED");
     }
   }
   
   
-  if(!SPIFFS.begin(true)){
-    //Serial.println("An Error has occurred while mounting SPIFFS");
-    return;
-  }
 
   SD.begin();
   File root = SD.open("/");
   if(!root){
     Serial.println("sd card failed");
   }
+  sd="";
+  uint8_t cardType = SD.cardType();
+
+  if(cardType == CARD_NONE){
+    sd="No SD CARD;";
+    Serial.println("No SD card attached");
+    return;
+  }
+
+  Serial.print("SD Card Type: ");
+  if(cardType == CARD_MMC){
+    sd="MMC;";
+    Serial.println("MMC");
+  } else if(cardType == CARD_SD){
+    sd="SDSC;";
+    Serial.println("SDSC");
+  } else if(cardType == CARD_SDHC){
+    sd="SDHC;";
+    Serial.println("SDHC");
+  } else {
+    sd="UNKNOWN;";
+    Serial.println("UNKNOWN");
+  }
+  int cardSize = SD.cardSize() / (1024 * 1024);
+  sd+=String(cardSize)+";";
+  int used = SD.usedBytes() / (1024 * 1024);
+  sd+=String(used)+";";
+
   
+
   source = new AudioFileSourceSD();
-  output = new AudioOutputI2S(0,1,8,0);
+  output = new AudioOutputI2S(0,1,128,0);
+  output->SetGain(1);
+ // output = new AudioOutputI2SNoDAC;
   decoder = new AudioGeneratorMP3();
 
   //Serial.println("SCL : " + String(digitalRead(SCL)));
   //Serial.println("SDA : " + String(digitalRead(SDA)));
 
-
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SPIFFS, "/index.html", String(), false, processor);
+  server.on("/backup", HTTP_GET, [](AsyncWebServerRequest *request){
+    backup();
+    request->send(SPIFFS, "/backup.txt", String(), true);
+  });
+  server.on("/", HTTP_ANY, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/index.html");
   });
   server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/favicon.ico", "image/x-icon");
@@ -260,6 +366,10 @@ void setup() {
   // Route to load style.css file
   server.on("/font.css", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/font.css", "text/css");
+  });
+  // Route to load style.css file
+  server.on("/index.js", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/index.js", "text/css");
   });
   // Route to load style.css file
   server.on("/jquery.min.js", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -307,14 +417,16 @@ void setup() {
   
   server.on("/upload", HTTP_POST, [](AsyncWebServerRequest *request) {
     request->send(200);
+    Serial.println("handleupload");
   }, handleUpload);
+  
   server.begin();
+  //delay(1000);
   Serial.print("Connected to ");  
   webSocket.begin();
+  //delay(1000);
   webSocket.onEvent(webSocketEvent);
-  lcd.init();
-    // turn on LCD backlight                      
-  lcd.backlight();
+
 //  //Serial.println("display begin");
 //  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)){
 //    //Serial.println("display failed");  
@@ -339,18 +451,35 @@ void loop() {
       if (!decoder->loop()) {
         stopPlayer();
         namaJadwal="";
-      }else{
-        if (namaJadwal!=""){
-          lcd.clear();
-          lcd.setCursor(0,0);
-          lcd.print(namaJadwal);
-        }
+        jamJadwal="";
       }
     }
   }
-
-  
 } 
+
+void configModeCallback (WiFiManager *myWiFiManager) {
+  lcd.clear();
+  lcd.setCursor(2,0);
+  lcd.print("Enter Config");
+  lcd.setCursor(2,1);
+  lcd.print(WiFi.softAPIP());
+  Serial.println("Config mode");
+  Serial.println(WiFi.softAPIP());
+
+  Serial.println(myWiFiManager->getConfigPortalSSID());
+}
+
+
+void printCenter(String msg, int row){
+  //lcd.clear();
+  int s = 0;
+  if (msg.length()<=16){
+    s = (16-msg.length())/2;
+  }
+  lcd.setCursor(s,row);
+  lcd.print(msg);
+  
+}
 
 void startRTC(){
   int rtn = I2C_ClearBus(); // clear the I2C bus first before calling Wire.begin()
@@ -390,30 +519,47 @@ void belScheduler() {
   int jamRTC = now.Hour();
   int menitRTC = now.Minute();
   int detikRTC = now.Second();
+  unsigned long currentMillis = millis();
   
-  lcd.setCursor(0,0);
-  lcd.print(daysOfTheWeek[now.DayOfWeek()]);
-  lcd.print(",");
-  printAngka(tanggal);
-  lcd.print("-");
-  printAngka(bulan);
-  lcd.print("-");
-  printAngka(tahun);  
+  // if WiFi is down, try reconnecting every CHECK_WIFI_TIME seconds
+  if ((WiFi.status() != WL_CONNECTED) && (currentMillis - previousMillis >=interval)) {
+    Serial.print(millis());
+    Serial.println("Reconnecting to WiFi...");
+    WiFi.disconnect();
+    WiFi.reconnect();
+    isConnected=false;
+    previousMillis = currentMillis;
+  }
+  if (WiFi.status() == WL_CONNECTED){
+    isConnected=true;
     
-  lcd.setCursor(4,1);
-  printAngka(jamRTC);
-  lcd.print(":");
-  printAngka(menitRTC);
-  lcd.print(":");
-  printAngka(detikRTC);
-  delay(100);
-
+  }
   
-  
+  if (namaJadwal==""){
+    if (isConnected){
+      tampilan();
+    }else{
+      lcd.clear();
+      lcd.setCursor(1,0);
+      lcd.print("Koneksi putus.");
+      for (int i=3;i>=0;i--){
+        if (i==0){
+        ESP.restart();
+        }
+        lcd.setCursor(0,1);
+        String msg="Restart dalam "+String(i)+"d";
+        lcd.print(msg);
+        delay(1000);
+      }
+    }
+  }else{
+    printCenter(namaJadwal,0);
+    printCenter(jamJadwal,1);
+  }
+  //delay(100);
   int count;
   int posLine= 0;
   int posDel=0;
-
   if (sizeof(jadwal)>0){
     ////Serial.println("jadwal ada");
     while (posLine<= jadwal.lastIndexOf("\n")) {
@@ -421,9 +567,9 @@ void belScheduler() {
         boolean ketemuHari=false;
         ////Serial.println("ketemu char " + String(jadwal.indexOf("\n",posLine)) +" dari "+ String(jadwal.lastIndexOf("\n")));
         posDel=posLine;
-        String nama, haris, jams, nada, ruangan;
+        String nama, haris, jams, nada, ruangan, aktif;
         String intHari, intJam, intMenit;
-        for (int i=0;i<=4;i++){
+        for (int i=0;i<=5;i++){
           String val = jadwal.substring(posDel,jadwal.indexOf(";",posDel));
          
           val.replace("jadwal__","");
@@ -437,12 +583,186 @@ void belScheduler() {
               
               ////Serial.println("valhari : " + valHari);
               if (valHari.endsWith("_on")){
-                
+               
                // //Serial.println("hari sekarang : " + String(hari));
                // //Serial.println("hari yang on " + String(x+1));
+               if (hari==x+1){
+                 ketemuHari = true;
+                // //Serial.println("ketemu jadwal hari ini " + String(valHari));
+                 break;
+               }
+              }
+              posHari=val.indexOf(",",posHari)+1;
+            }
+          }else if(i==2){
+            intJam = val.substring(0,val.indexOf(":"));
+            intMenit = val.substring(val.indexOf(":")+1,sizeof(val)+1);
+          }else if(i==3){
+            nada=val;
+          }else if(i==4){
+            ruangan=val;
+          }else if(i==5){
+            aktif=val.substring(0,val.indexOf("\n"));
+          }
+
+          posDel=jadwal.indexOf(";",posDel)+1;
+         // //Serial.println("barisnya " + String(val));
+        }
+        if (ketemuHari){
+          
+          ////Serial.println("ketemu hari");
+          ////Serial.println("jam sekarang" + String(jamRTC) + ":" + String(menitRTC)+ ":" + String(detikRTC));
+          ////Serial.println("jadwal :" + String(intJam) + ":" + String(intMenit));
+          int mil = millis();
+          
+          if (jamRTC==intJam.toInt() && menitRTC==intMenit.toInt() && detikRTC==0){
+            Serial.println("aktif : " + aktif + ", sends : " + sends);
+            if (aktif.startsWith("on") && sends==false){
+              sends=true;
+              namaJadwal=nama;
+              jamJadwal=intJam+":"+intMenit+":00";
+              turnRoomsOn(ruangan, nada);
+              lcd.clear();
+            }
+          }
+          
+        }
+        
+        count++;
+        posLine=jadwal.indexOf("\n",posLine)+1;
+      }
+    }
+  }
+}
+
+
+
+
+
+uint8_t tampilanjam;
+void tampilan() {
+  
+  if (tampilanjam > 1) {
+    tampilanjam = 0;
+  }
+  switch(tampilanjam) {
+    case 0 :
+      tampilJam();
+      break;  
+    case 1 :
+      tampilJadwal();
+      break;
+  }
+}
+
+void tampilJam(){
+  static uint8_t d;
+  static uint32_t pM;
+  uint32_t cM = millis();
+  
+  RtcDateTime now = Rtc.GetDateTime();
+  char daysOfTheWeek[7][12] = {"Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"};
+  int tahun = now.Year();
+  int bulan = now.Month();
+  int tanggal = now.Day();
+  int hari = now.DayOfWeek();
+  int jamRTC = now.Hour();
+  int menitRTC = now.Minute();
+  int detikRTC = now.Second();
+  String hp = daysOfTheWeek[now.DayOfWeek()];
+  if (cM - pM > 1000) {
+    pM = cM;
+    d++;
+    lcd.clear();
+    lcd.setCursor(1,1);
+    lcd.print(hp.substring(0,3));
+    lcd.print(",");
+    printAngka(tanggal);
+    lcd.print("-");
+    printAngka(bulan);
+    lcd.print("-");
+    printAngka(tahun);  
+      
+    lcd.setCursor(4,0);
+    printAngka(jamRTC);
+    lcd.print(":");
+    printAngka(menitRTC);
+    lcd.print(":");
+    printAngka(detikRTC);
+    //Serial.println(detikRTC);
+    if (d >=10){
+      d=0;
+      lcd.clear(); 
+      tampilanjam=1;
+    }
+  }
+}
+
+
+void tampilJadwal(){
+  cj=0;
+  static uint8_t d=0;
+  static uint32_t pM;
+
+  uint32_t cM = millis();
+  
+  if (cM - pM > 2000) {
+    pM = cM;
+
+    getJadwalToday();
+    if (cj>0){
+      String aj= arrJadwal[d];
+      String jadwal = aj.substring(0,aj.indexOf(";"));
+      String jam = aj.substring(aj.indexOf(";")+1,aj.length());
+      lcd.clear();
+      printCenter(jadwal,0);
+      lcd.setCursor(4,1);
+      lcd.print(jam+":00");
+    }else{    
+      lcd.clear();
+      lcd.setCursor(0,0);
+      lcd.print("Tidak ada jadwal");
+    }
+    
+    
+    d++;
+    if (d > cj) {
+      d = 0;
+      lcd.clear();
+      tampilanjam = 0;
+    }  
+  } 
+}
+
+
+void getJadwalToday(){
+  
+  RtcDateTime now = Rtc.GetDateTime();
+  int hari = now.DayOfWeek();
+  int count;
+  int posLine= 0;
+  int posDel=0;
+  if (sizeof(jadwal)>0){
+    ////Serial.println("jadwal ada");
+    while (posLine<= jadwal.lastIndexOf("\n")) {
+      if (jadwal.indexOf("\n",posLine)>0){
+        boolean ketemuHari=false;
+        posDel=posLine;
+        String nama, haris, jams, nada, ruangan, aktif;
+        String intHari, intJam, intMenit;
+        for (int i=0;i<=5;i++){
+          String val = jadwal.substring(posDel,jadwal.indexOf(";",posDel));
+          val.replace("jadwal__","");
+          if (i==0){
+            nama=val;
+          }else if(i==1){
+            haris=val;
+            int posHari=0;
+            for (int x=0;x<7;x++){
+              String valHari=val.substring(posHari,val.indexOf(",",posHari));
+              if (valHari.endsWith("_on")){
                 if (hari==x+1){
                   ketemuHari = true;
-                 // //Serial.println("ketemu jadwal hari ini " + String(valHari));
                   break;
                 }
               }
@@ -455,27 +775,18 @@ void belScheduler() {
             nada=val;
           }else if(i==4){
             ruangan=val;
-             
+          }else if(i==5){
+            aktif=val.substring(0,val.indexOf("\n"));
           }
 
           posDel=jadwal.indexOf(";",posDel)+1;
-         // //Serial.println("barisnya " + String(val));
         }
         if (ketemuHari){
-          
-          ////Serial.println("ketemu hari");
-          ////Serial.println("jam sekarang" + String(jamRTC) + ":" + String(menitRTC)+ ":" + String(detikRTC));
-          ////Serial.println("jadwal :" + String(intJam) + ":" + String(intMenit));
-          if (jamRTC==intJam.toInt() && menitRTC==intMenit.toInt() && detikRTC==0){
-            namaJadwal=nama;
-            Serial.println("menyalakan ruangan " + ruangan);
-            turnRoomsOn(ruangan, nada);
-            sends=false;
-            //Serial.println("mainkan " + nada);
+          if (aktif.startsWith("on")){
+            arrJadwal[cj]=nama+";"+intJam+":"+intMenit;
+            cj++;
           }
-          
         }
-        
         count++;
         posLine=jadwal.indexOf("\n",posLine)+1;
       }
@@ -514,6 +825,7 @@ void stopPlayer(){
   if ((decoder) && (decoder->isRunning())) {
     decoder->stop();
     String udah = "udah_";
+    sends=false;
     const char* c= udah.c_str();
     webSocket.broadcastTXT(c);
     File f2 = SPIFFS.open("/speakerstate.txt", "r");
@@ -526,7 +838,7 @@ void stopPlayer(){
       //Serial.println("mulai membaca rooms ");
       String line = f2.readStringUntil('\n');
       rooms += line;
-      Serial.println("isi rooms : " + rooms);
+      //Serial.println("isi rooms : " + rooms);
     }
     f2.close();
     if (rooms.startsWith("speaker_off")){
@@ -548,11 +860,11 @@ void getTime(){
 }
 
 void getSongs(){
-  Serial.println("opening sd card ");
+  //Serial.println("opening sd card ");
   File root = SD.open("/");
   songs="";
   if(!root){
-    Serial.println("sd card failed");
+    //Serial.println("sd card failed");
     return;
   }
   if(!root.isDirectory()){
@@ -576,23 +888,49 @@ void getSongs(){
 
 void saveJadwal(String strJadwal){
   //Serial.println("appending " + strJadwal);
-  File f = SPIFFS.open("/f.txt", "a");
+  String nama = strJadwal.substring(0,strJadwal.indexOf(";"));
+  Serial.println("menyimpan jadwal " + nama);
+  File f2 = SPIFFS.open("/f.txt", "r");
   
-  if (!f) {
-    //Serial.println("File doesn't exist yet. Creating it");
-    File f = SPIFFS.open("/f.txt", "w");
-    if (!f) {
-      //Serial.println("file creation failed");
-    }else{
-      f.println(strJadwal);  
-      //Serial.println("bikin file baru berhasil");
-    }
-  }else{
-    //Serial.println("file ketemu, isinya : " + f.read());
-    f.println(strJadwal);
+  boolean ketemu=false;
+  if (f2) {
+    while(f2.available()) {
+      String line = f2.readStringUntil('\n');
+      String n= line.substring(0,line.indexOf(";"));
+      
+      Serial.println("current line jadwal " + n);
+      if (nama==n){
+        Serial.println("ketemu " + n);
+        ketemu=true;
+      }
+    }  
   }
-  f.close();
-  getJadwal();
+  f2.close();
+  if (!ketemu){
+    File f = SPIFFS.open("/f.txt", "a");
+    
+    if (!f) {
+      //Serial.println("File doesn't exist yet. Creating it");
+      File f = SPIFFS.open("/f.txt", "w");
+      if (!f) {
+        //Serial.println("file creation failed");
+      }else{
+        f.println(strJadwal);  
+        //Serial.println("bikin file baru berhasil");
+      }
+    }else{
+      //Serial.println("file ketemu, isinya : " + f.read());
+      
+      f.println(strJadwal);
+    }
+    f.close();
+    getJadwal();
+  }else{
+    String msg = "jadwalExists__"+nama;
+    const char* c= msg.c_str();
+    webSocket.broadcastTXT(c);
+  }
+  
 }
 
 
@@ -775,6 +1113,7 @@ void addRooms(String strRooms){
   
   f.close();
   getRooms();
+  getNamaRooms();
 }
 
 
@@ -810,6 +1149,7 @@ void updateRooms(String strRooms){
   }
   f.close();
   getRooms();
+  getNamaRooms();
 }
 
 void deleteRooms(String strRooms){
@@ -843,6 +1183,7 @@ void deleteRooms(String strRooms){
   }
   f.close();
   getRooms();
+  getNamaRooms();
 }
 
 
@@ -867,14 +1208,14 @@ void getRooms(){
 
 
 void updateNamaRooms(String strRooms){
-  Serial.println("updating" + strRooms);
+  //Serial.println("updating" + strRooms);
 
   File f = SPIFFS.open("/namarooms.txt", "w");
   if (!f) {
     //Serial.println("file creation failed");
   }else{
     f.println(strRooms);  
-    Serial.println("bikin file baru berhasil");
+    //Serial.println("bikin file baru berhasil");
   }
  
   f.close();
@@ -892,7 +1233,7 @@ void getNamaRooms(){
     //Serial.println("mulai membaca rooms ");
     String line = f2.readStringUntil('\n');
     rooms += line +"\n";
-    Serial.println("isi rooms : " + rooms);
+    //Serial.println("isi rooms : " + rooms);
   }
   rooms = "roomsname__"+rooms;
   const char* c= rooms.c_str();
@@ -911,7 +1252,7 @@ void getSpeakerState(){
     //Serial.println("mulai membaca rooms ");
     String line = f2.readStringUntil('\n');
     rooms += line;
-    Serial.println("isi rooms : " + rooms);
+    //Serial.println("isi rooms : " + rooms);
   }
   rooms = "speakerstate__"+rooms;
   const char* c= rooms.c_str();
@@ -919,19 +1260,43 @@ void getSpeakerState(){
   f2.close();
 }
 
+
+void getWifi(){
+  File f2 = SPIFFS.open("/wifi.txt", "r");
+  if (!f2) {
+    //Serial.println("open failed");
+  }
+  String rooms="";
+  //Serial.println("open oke");
+  while(f2.available()) {
+    //Serial.println("mulai membaca wifi ");
+    String line = f2.readStringUntil('\n');
+    rooms += line;
+    //Serial.println("isi wifi : " + rooms);
+  }
+  rooms = "wifi__"+rooms;
+  const char* c= rooms.c_str();
+  webSocket.broadcastTXT(c);
+  f2.close();
+  String sdcard = "sdcard__"+sd;
+  const char* cc= sdcard.c_str();
+  webSocket.broadcastTXT(cc);
+}
+
 void turnRoomsOn(String rooms, String nada){
+  
   rooms=rooms.substring(0,rooms.indexOf("\n"));
   int count;
   int posRuangan= 0;
   int posDel=0;
   
-  Serial.println("mulai membaca ruangan ");
+  Serial.println("Menyalakan ruangan " + rooms);
   if (rooms=="Semua Ruangan"){
     turnSpeaker("speaker_all_on");
   }else{
     File f3 = SPIFFS.open("/rooms.txt", "r");
     if (!f3) {
-      Serial.println("open failed");
+      //Serial.println("open failed");
     }
     String ruangan="";
     //Serial.println("open oke");
@@ -939,12 +1304,12 @@ void turnRoomsOn(String rooms, String nada){
     while(f3.available()) {
       String line = f3.readStringUntil('\n');
       if (sizeof(line)>0){
-        Serial.println("line : " + line);
+        //Serial.println("line : " + line);
         String n=line.substring(0,line.indexOf("~"));
         rooms.trim();
         n.replace("rooms:","");
         n.trim();
-        Serial.println("n : " + n + " = rooms : " + rooms);
+        //Serial.println("n : " + n + " = rooms : " + rooms);
         if (rooms.equals(n)){
           ruangan=line.substring(line.indexOf("~"));
           break;
@@ -954,19 +1319,18 @@ void turnRoomsOn(String rooms, String nada){
     }
     f3.close();
     
-    Serial.println("ruangan : " + ruangan);
+    //Serial.println("ruangan : " + ruangan);
     if (sizeof(ruangan)>0){
       for (int x=0;x<32;x++){
         String valRuangan=ruangan.substring(posRuangan,ruangan.indexOf(",",posRuangan));
         
-        Serial.println("valRuangan : " + valRuangan);
+        //Serial.println("valRuangan : " + valRuangan);
         turnSpeaker(valRuangan);
         posRuangan=ruangan.indexOf(",",posRuangan)+1;
       }
     }
     
   }
-  delay(50);
   const char* string1 = nada.c_str();
   playFile(string1);
 }
@@ -983,7 +1347,7 @@ void turnSpeaker(String text){
         pcf[i].digitalWrite(x,state);
       }
     }
-    Serial.println("turn speaker all speaker "+ String(state));
+    //Serial.println("turn speaker all speaker "+ String(state));
   }else{
     text.replace("speaker_","");
     text.replace("_on","");
@@ -994,8 +1358,8 @@ void turnSpeaker(String text){
       for (int x=0;x<8;x++){
         if (y==no){
           pcf[i].digitalWrite(x,state);
-          Serial.println("turn speaker no " +String(x)+" " + String(state));
-          break;
+          //Serial.println("turn speaker no " +String(y)+" " + String(state));
+          //break;
         }
         y++;
       }
@@ -1004,23 +1368,41 @@ void turnSpeaker(String text){
 }
 
 void changeSpeakerState(String text){
-  Serial.println("updating" + text);
+  //Serial.println("updating" + text);
 
   File f = SPIFFS.open("/speakerstate.txt", "w");
   if (!f) {
     //Serial.println("file creation failed");
   }else{
     f.print(text);  
-    Serial.println("bikin file baru berhasil");
+    //Serial.println("bikin file baru berhasil");
   }
  
   f.close();
 }
 
+void updateWifi(String text){
+  Serial.println("updating wifi" + text);
+
+  File f = SPIFFS.open("/wifi.txt", "w");
+  if (!f) {
+    Serial.println("file creation failed");
+  }else{
+    f.print(text);  
+    Serial.println("bikin file baru berhasil");
+  }
+  f.close();
+}
+
+
+void setVolume(String text){
+  float vol = text.toDouble()/100;
+  output->SetGain(vol);
+}
 
 void handleUpload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
   String logmessage = "Client:" + request->client()->remoteIP().toString() + " " + request->url();
-  //Serial.println(logmessage);
+  Serial.println(logmessage);
   filename.replace(",","");
 
   if(!filename.startsWith("/")) filename = "/"+filename;
@@ -1039,18 +1421,55 @@ void handleUpload(AsyncWebServerRequest *request, String filename, size_t index,
     // stream the incoming chunk to the opened file
     request->_tempFile.write(data, len);
     logmessage = "Writing file: " + String(filename) + " index=" + String(index) + " len=" + String(len);
-    //Serial.println(logmessage);
+    Serial.println(logmessage);
   }
 
   if (final) {
     logmessage = "Upload Complete: " + String(filename) + ",size: " + String(index + len);
     // close the file handle as the upload is now done
     request->_tempFile.close();
-    //Serial.println(logmessage);
-    request->send(200,"text",logmessage);
+    Serial.println(logmessage);
+    //request->send(200,"text",logmessage);
     //request->redirect("/");
     getSongs();
   }
+}
+void restore(String text){
+  String namaFile = text.substring(0,text.indexOf("~"));
+  String isi = text.substring(text.indexOf("~")+1,text.length());
+  
+  File f = SPIFFS.open(namaFile, "w");
+  if (!f) {
+    //Serial.println("file creation failed");
+  }else{
+    f.print(isi);  
+    //Serial.println("bikin file baru berhasil");
+  }
+  f.close();
+}
+
+void backup(){
+  String listFiles[] = {"/speakerstate.txt","/f.txt","/rooms.txt", "/namarooms.txt", "/wifi.txt"};
+  File f = SPIFFS.open("/backup.txt", "w");
+  if (f) {
+    for (int x=0;x<5;x++){
+      File f2 = SPIFFS.open(listFiles[x], "r");
+      if (f2) {
+        while(f2.available()) {
+          String line = f2.readStringUntil('\n');
+          f.println(line);
+          Serial.println(f);
+        }
+        if(x<4){
+          f.println("thisisseparatorbetweenfiles");
+        }
+        f2.close();
+      }
+      
+    }
+  }
+  f.close();
+  
 }
 
 void deleteSongs(String filename){
