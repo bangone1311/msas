@@ -14,6 +14,9 @@
 #include "AudioOutputMixer.h"
 #include "PCF8574.h"
 #include <LiquidCrystal_I2C.h>
+#include <WiFiClientSecure.h>
+#include <HTTPClient.h>
+#include <HTTPUpdate.h>
 
 //#include <Adafruit_GFX.h>
 //#include <Adafruit_SSD1306.h>
@@ -53,6 +56,9 @@ String sd ="";
 boolean isConnected=true;
 unsigned long previousMillis = 0;
 unsigned long interval = 30000;
+
+#define URL_fw_Bin "https://raw.githubusercontent.com/programmer131/ESP8266_ESP32_SelfUpdate/master/esp32_ota/fw.bin"
+
 
 void buildXML(){
   RtcDateTime now = Rtc.GetDateTime();
@@ -195,6 +201,8 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
         }else if (text.startsWith("restore_")){
           text.replace("restore_","");
           restore(text);
+        }else if (text.startsWith("updateFW_")){
+          firmwareUpdate();
         }else{
           turnSpeaker(text);
         }
@@ -478,7 +486,6 @@ void printCenter(String msg, int row){
   }
   lcd.setCursor(s,row);
   lcd.print(msg);
-  
 }
 
 void startRTC(){
@@ -1548,4 +1555,25 @@ int I2C_ClearBus() {
   pinMode(SDA, INPUT); // and reset pins as tri-state inputs which is the default state on reset
   pinMode(SCL, INPUT);
   return 0; // all ok
+}
+
+void firmwareUpdate() {
+  WiFiClientSecure client;
+  client.setCACert(rootCACertificate);
+  httpUpdate.setLedPin(LED_BUILTIN, LOW);
+  t_httpUpdate_return ret = httpUpdate.update(client, URL_fw_Bin);
+
+  switch (ret) {
+  case HTTP_UPDATE_FAILED:
+    Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", httpUpdate.getLastError(), httpUpdate.getLastErrorString().c_str());
+    break;
+
+  case HTTP_UPDATE_NO_UPDATES:
+    Serial.println("HTTP_UPDATE_NO_UPDATES");
+    break;
+
+  case HTTP_UPDATE_OK:
+    Serial.println("HTTP_UPDATE_OK");
+    break;
+  }
 }
