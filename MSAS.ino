@@ -14,18 +14,7 @@
 #include "AudioOutputMixer.h"
 #include "PCF8574.h"
 #include <LiquidCrystal_I2C.h>
-#include <WiFiClientSecure.h>
-#include <HTTPClient.h>
-#include <HTTPUpdate.h>
 
-//#include <Adafruit_GFX.h>
-//#include <Adafruit_SSD1306.h>
-//#include "logo.h"
-//
-//#define SCREEN_WIDTH 128 // OLED display width, in pixels
-//#define SCREEN_HEIGHT 64 // OLED display height, in pixels
-//#define OLED_RESET     4 // Reset pin # (or -1 if sharing Arduino reset pin)
-//Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 char buff[10];
 
 String message, XML,songs="",jadwal="0";
@@ -58,7 +47,6 @@ unsigned long previousMillis = 0;
 unsigned long interval = 30000;
 
 #define URL_fw_Bin "https://raw.githubusercontent.com/programmer131/ESP8266_ESP32_SelfUpdate/master/esp32_ota/fw.bin"
-
 
 void buildXML(){
   RtcDateTime now = Rtc.GetDateTime();
@@ -107,8 +95,6 @@ PCF8574 pcf1(0x20);
 PCF8574 pcf2(0x21),pcf3(0x22),pcf4(0x23);//,pcf5(0x24);
 PCF8574 pcf[] = {pcf1,pcf2,pcf3,pcf4};
 int pcfCount = sizeof(pcf)/sizeof(pcf1);
-//int pin[] = {15,0,4,16,17,5,18,  19,21,3,22, 23,13,12,14, 27,26,25,33, 32,35,34,39};
-//int ss = sizeof(pin)/sizeof(pin[0]);
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length)
 {
   Serial.printf("webSocketEvent(%d, %d, ...)\r\n", num, type);
@@ -201,8 +187,6 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
         }else if (text.startsWith("restore_")){
           text.replace("restore_","");
           restore(text);
-        }else if (text.startsWith("updateFW_")){
-          firmwareUpdate();
         }else{
           turnSpeaker(text);
         }
@@ -220,12 +204,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
 String processor(const String& var){
     //Serial.println(var);
   if(var == "STATE"){
-    //if(digitalRead(ledPin)){
-    //  ledState = "ON";
-    //}
-    //else{
-      ledState = "OFF";
-    //}
+    ledState = "OFF";
     Serial.print(ledState);
     return ledState;
   }
@@ -303,8 +282,6 @@ void setup() {
     }
   }
   
-  
-
   SD.begin();
   File root = SD.open("/");
   if(!root){
@@ -338,16 +315,10 @@ void setup() {
   int used = SD.usedBytes() / (1024 * 1024);
   sd+=String(used)+";";
 
-  
-
   source = new AudioFileSourceSD();
   output = new AudioOutputI2S(0,1,128,0);
   output->SetGain(1);
- // output = new AudioOutputI2SNoDAC;
   decoder = new AudioGeneratorMP3();
-
-  //Serial.println("SCL : " + String(digitalRead(SCL)));
-  //Serial.println("SDA : " + String(digitalRead(SDA)));
 
   server.on("/backup", HTTP_GET, [](AsyncWebServerRequest *request){
     backup();
@@ -434,19 +405,6 @@ void setup() {
   webSocket.begin();
   //delay(1000);
   webSocket.onEvent(webSocketEvent);
-
-//  //Serial.println("display begin");
-//  if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)){
-//    //Serial.println("display failed");  
-//  }  
-//  //Serial.println("display connected");  
-//  // Clear the buffer.
-//  display.clearDisplay();
-//
-//  // Display bitmap
-//  //Serial.println("drawing bitmap");
-//  display.drawBitmap(0, 0,  MarilynMonroe, 128, 64, WHITE);
-//  display.display();
   changeSpeakerState("speaker_off;Semua Ruangan");
   getJadwal();
   
@@ -491,15 +449,11 @@ void printCenter(String msg, int row){
 void startRTC(){
   int rtn = I2C_ClearBus(); // clear the I2C bus first before calling Wire.begin()
   if (rtn != 0) {
-    //Serial.println(F("I2C bus error. Could not clear"));
     if (rtn == 1) {
-      //Serial.println(F("SCL clock line held low"));
     } else if (rtn == 2) {
-      //Serial.println(F("SCL clock line held low by slave clock stretch"));
     } else if (rtn == 3) {
-      //Serial.println(F("SDA data line held low"));
     }
-  } else { // bus clear, re-enable Wire, now can start Wire Arduino master
+  } else {
     Wire.begin();
   }
   
@@ -508,15 +462,11 @@ void startRTC(){
   if (!Rtc.GetIsRunning()) {
     Rtc.SetIsRunning(true);
   }
-  
   Rtc.Enable32kHzPin(false);
   Rtc.SetSquareWavePin(DS3231SquareWavePin_ModeNone); 
-  
-  //Serial.println("Setup RTC selesai");
 }
 
 void belScheduler() {
-  ////Serial.println("Start scheduler");
   RtcDateTime now = Rtc.GetDateTime();
   char daysOfTheWeek[7][12] = {"Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"};
   int tahun = now.Year();
@@ -527,8 +477,6 @@ void belScheduler() {
   int menitRTC = now.Minute();
   int detikRTC = now.Second();
   unsigned long currentMillis = millis();
-  
-  // if WiFi is down, try reconnecting every CHECK_WIFI_TIME seconds
   if ((WiFi.status() != WL_CONNECTED) && (currentMillis - previousMillis >=interval)) {
     Serial.print(millis());
     Serial.println("Reconnecting to WiFi...");
@@ -560,19 +508,17 @@ void belScheduler() {
       }
     }
   }else{
+    Serial.println(namaJadwal);
     printCenter(namaJadwal,0);
     printCenter(jamJadwal,1);
   }
-  //delay(100);
   int count;
   int posLine= 0;
   int posDel=0;
   if (sizeof(jadwal)>0){
-    ////Serial.println("jadwal ada");
     while (posLine<= jadwal.lastIndexOf("\n")) {
       if (jadwal.indexOf("\n",posLine)>0){
         boolean ketemuHari=false;
-        ////Serial.println("ketemu char " + String(jadwal.indexOf("\n",posLine)) +" dari "+ String(jadwal.lastIndexOf("\n")));
         posDel=posLine;
         String nama, haris, jams, nada, ruangan, aktif;
         String intHari, intJam, intMenit;
@@ -587,15 +533,9 @@ void belScheduler() {
             int posHari=0;
             for (int x=0;x<7;x++){
               String valHari=val.substring(posHari,val.indexOf(",",posHari));
-              
-              ////Serial.println("valhari : " + valHari);
               if (valHari.endsWith("_on")){
-               
-               // //Serial.println("hari sekarang : " + String(hari));
-               // //Serial.println("hari yang on " + String(x+1));
                if (hari==x+1){
                  ketemuHari = true;
-                // //Serial.println("ketemu jadwal hari ini " + String(valHari));
                  break;
                }
               }
@@ -613,13 +553,8 @@ void belScheduler() {
           }
 
           posDel=jadwal.indexOf(";",posDel)+1;
-         // //Serial.println("barisnya " + String(val));
         }
         if (ketemuHari){
-          
-          ////Serial.println("ketemu hari");
-          ////Serial.println("jam sekarang" + String(jamRTC) + ":" + String(menitRTC)+ ":" + String(detikRTC));
-          ////Serial.println("jadwal :" + String(intJam) + ":" + String(intMenit));
           int mil = millis();
           
           if (jamRTC==intJam.toInt() && menitRTC==intMenit.toInt() && detikRTC==0){
@@ -632,19 +567,13 @@ void belScheduler() {
               lcd.clear();
             }
           }
-          
         }
-        
         count++;
         posLine=jadwal.indexOf("\n",posLine)+1;
       }
     }
   }
 }
-
-
-
-
 
 uint8_t tampilanjam;
 void tampilan() {
@@ -723,6 +652,7 @@ void tampilJadwal(){
       String jam = aj.substring(aj.indexOf(";")+1,aj.length());
       lcd.clear();
       printCenter(jadwal,0);
+      //Serial.println(jadwal);
       lcd.setCursor(4,1);
       lcd.print(jam+":00");
     }else{    
@@ -752,7 +682,7 @@ void getJadwalToday(){
   if (sizeof(jadwal)>0){
     ////Serial.println("jadwal ada");
     while (posLine<= jadwal.lastIndexOf("\n")) {
-      if (jadwal.indexOf("\n",posLine)>0){
+      if (jadwal.indexOf("\n",posLine)>0 && jadwal.indexOf(";",posLine)>0){
         boolean ketemuHari=false;
         posDel=posLine;
         String nama, haris, jams, nada, ruangan, aktif;
@@ -760,6 +690,7 @@ void getJadwalToday(){
         for (int i=0;i<=5;i++){
           String val = jadwal.substring(posDel,jadwal.indexOf(";",posDel));
           val.replace("jadwal__","");
+          val.trim();
           if (i==0){
             nama=val;
           }else if(i==1){
@@ -791,6 +722,7 @@ void getJadwalToday(){
         if (ketemuHari){
           if (aktif.startsWith("on")){
             arrJadwal[cj]=nama+";"+intJam+":"+intMenit;
+            //Serial.println(arrJadwal[cj]);
             cj++;
           }
         }
@@ -989,9 +921,12 @@ void deleteJadwal(String strJadwal){
     //Serial.println("mulai membaca jadwal ");
     String line = f2.readStringUntil('\n');
     String n= line.substring(0,line.indexOf(";"));
-    if (nama!=n){
-      jadwal += line +"\n";
+    if (line!=""){
+      if (nama!=n){
+        jadwal += line +"\n";
+      }
     }
+    
     //Serial.println("isi jadwal baru : " + jadwal);
   }
   f2.close();
@@ -1051,19 +986,10 @@ void updateDate(String strDate){
     uint8_t bulan;
     uint8_t tanggal;      
     String sd= strDate;
-    
-    //Serial.println("mengubah tanggal : " + sd);
-    
-//    tahun = ((sd[1]-'0')*1000)+((sd[2]-'0')*100)+((sd[3]-'0')*10)+(sd[4]-'0');
-//    bulan = ((sd[6]-'0')*10)+(sd[7]-'0');
-//    tanggal = ((sd[9]-'0')*10)+(sd[10]-'0');
 
     String intTahun = sd.substring(0,4);
     String intBulan = sd.substring(5,7);
     String intTanggal = sd.substring(8,10);
-
-    //Serial.println("mengubah tanggal : " + intTahun + "-" +intBulan+ "-"+intTanggal);
-
     tahun=intTahun.toInt();
     bulan=intBulan.toInt();
     tanggal=intTanggal.toInt();
@@ -1071,8 +997,6 @@ void updateDate(String strDate){
     uint8_t jam = now.Hour();
     uint8_t menit = now.Minute();
     Rtc.SetDateTime(RtcDateTime(tahun, bulan, tanggal, jam, menit, 0));
-    
-    //Serial.println("berhasil ubah tanggal : " + sd);
     getTime();
 }
 
@@ -1080,16 +1004,11 @@ void updateDate(String strDate){
 void updateTime(String strTime){
    
       String st= strTime;
-//      uint8_t jam = ((st[1]-'0')*10)+(st[2]-'0');
-//      uint8_t menit = ((st[4]-'0')*10)+(st[5]-'0');
-      
       String intJam = st.substring(0,st.indexOf(":"));
       String intMenit = st.substring(st.indexOf(":")+1,sizeof(st)+1);
 
-      
       uint8_t jam = intJam.toInt();
       uint8_t menit = intMenit.toInt();
-      //Serial.println("mengubah waktu : " + st);
        RtcDateTime now = Rtc.GetDateTime();
        uint16_t tahun = now.Year();
        uint8_t bulan = now.Month();
@@ -1101,17 +1020,13 @@ void updateTime(String strTime){
 }
 
 void addRooms(String strRooms){
-  //Serial.println("appending " + strRooms);
   File f = SPIFFS.open("/rooms.txt", "a");
   
   if (!f) {
-    //Serial.println("File doesn't exist yet. Creating it");
     File f = SPIFFS.open("/rooms.txt", "w");
     if (!f) {
-      //Serial.println("file creation failed");
     }else{
       f.println(strRooms);  
-      //Serial.println("bikin file baru berhasil");
     }
   }else{
     //Serial.println("file ketemu, isinya : " + f.read());
@@ -1555,25 +1470,4 @@ int I2C_ClearBus() {
   pinMode(SDA, INPUT); // and reset pins as tri-state inputs which is the default state on reset
   pinMode(SCL, INPUT);
   return 0; // all ok
-}
-
-void firmwareUpdate() {
-  WiFiClientSecure client;
-  client.setCACert(rootCACertificate);
-  httpUpdate.setLedPin(LED_BUILTIN, LOW);
-  t_httpUpdate_return ret = httpUpdate.update(client, URL_fw_Bin);
-
-  switch (ret) {
-  case HTTP_UPDATE_FAILED:
-    Serial.printf("HTTP_UPDATE_FAILD Error (%d): %s\n", httpUpdate.getLastError(), httpUpdate.getLastErrorString().c_str());
-    break;
-
-  case HTTP_UPDATE_NO_UPDATES:
-    Serial.println("HTTP_UPDATE_NO_UPDATES");
-    break;
-
-  case HTTP_UPDATE_OK:
-    Serial.println("HTTP_UPDATE_OK");
-    break;
-  }
 }
